@@ -35,8 +35,7 @@ class AdminCustomerController extends Controller
     // Management Booking: list booking customer dengan status dan relasi customer
     public function indexBookings(Request $request)
     {
-        // Query booking dengan eager loading customer dan service
-        $query = Booking::with(['customer', 'service']);
+        $query = Booking::with(['customer.customerProfile', 'service']);
 
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
@@ -76,21 +75,33 @@ class AdminCustomerController extends Controller
     // Management Payment: list semua payment dengan filter status
     public function indexPayments(Request $request)
     {
-        $query = Payment::with('customer', 'booking');
+        // Membuat query dengan eager loading relasi booking, customer, customerProfile, dan service
+        $query = Payment::with(['booking.customer.customerProfile', 'booking.service']);
 
+        // Filter status pembayaran jika ada di query string
         if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
+            $query->where('payment_status', $request->status);
         }
 
+        // Mengurutkan berdasarkan tanggal dibuat terbaru dan melakukan paginasi
         $payments = $query->orderBy('created_at', 'desc')->paginate(20);
 
+        // Mengembalikan view dengan data payments
         return view('admin.payments.index', compact('payments'));
     }
 
-    // Detail payment (optional)
-    public function showPayment($id)
+    // Update payment status
+    public function updatePayment(Request $request, $id)
     {
-        $payment = Payment::with('customer', 'booking')->findOrFail($id);
-        return view('admin.payments.show', compact('payment'));
+        $request->validate([
+            'payment_status' => 'required|in:pending,confirmed,cancelled,completed,failed',
+        ]);
+
+        $payment = Payment::findOrFail($id);
+        $payment->payment_status = $request->payment_status;
+        $payment->save();
+
+        return redirect()->route('admin.payments.index')
+                         ->with('success', 'Status payment berhasil diperbarui.');
     }
 }
