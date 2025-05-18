@@ -17,12 +17,12 @@ class Booking extends Model
 
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer_id', 'id');
+        return $this->belongsTo(User::class, 'customer_id');
     }
 
     public function service()
     {
-        return $this->belongsTo(Service::class, 'service_id', 'service_id');
+        return $this->belongsTo(Service::class, 'service_id');
     }
 
     public function payment()

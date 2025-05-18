@@ -27,7 +27,7 @@ class User extends Authenticatable
     // Relasi ke customer profile
     public function customerProfile()
     {
-        return $this->hasOne(CustomerProfile::class, 'user_id', 'id');
+        return $this->hasOne(CustomerProfile::class, 'user_id');
     }
 
     // Relasi ke service provider profile
