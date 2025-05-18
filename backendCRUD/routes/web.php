@@ -32,7 +32,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/admin/bookings/{id}', [AdminCustomerController::class, 'bookingsUpdate'])->name('admin.bookings.update');
 
         Route::get('/payments', [AdminCustomerController::class, 'indexPayments'])->name('admin.payments.index');
-        Route::get('/payments/{id}', [AdminCustomerController::class, 'showPayment'])->name('admin.payments.show');
+        Route::put('payments/{id}', [AdminCustomerController::class, 'updatePayment'])->name('admin.payments.update');
+        Route::put('payments/{id}', [AdminCustomerController::class, 'updatePayment'])->name('admin.payments.update');
     });
 
     // Untuk service provider dashboard
