@@ -2,6 +2,14 @@
 
 @section('content')
 <style>
+    /* Efek blur untuk container yang diblur */
+    .blur {
+        filter: blur(6px);
+        pointer-events: none;
+        user-select: none;
+        transition: filter 0.3s ease;
+    }
+
     /* Style tabel */
     table.management-table {
         width: 100%;
@@ -103,100 +111,129 @@
     /* Modal box */
     .modal-content {
         background-color: #fff;
-        border-radius: 14px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        padding: 24px 28px;
-        max-width: 400px;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+        padding: 28px 32px;
+        max-width: 440px;
         width: 90%;
         font-family: 'Georgia', serif;
-        color: #222;
+        color: #3f2e25;
         position: relative;
         max-height: 90vh;
         overflow-y: auto;
         line-height: 1.5;
+
+        opacity: 0;
+        transform: scale(0.8);
+        animation: popup-zoom 0.3s forwards ease-in-out;
+    }
+    .modal-bg:not(.active) .modal-content {
+        animation: none;
+    }
+
+    @keyframes popup-zoom {
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
     /* Judul modal */
     .modal-content h2 {
         font-weight: 700;
-        font-size: 1.4rem;
-        margin-bottom: 16px;
+        font-size: 1.5rem;
+        margin-bottom: 18px;
+        border-bottom: 1px solid #b99a79;
+        padding-bottom: 6px;
+        color: #5a422a;
     }
 
     /* Paragraf modal detail */
     .modal-content p {
-        margin-bottom: 12px;
+        margin-bottom: 14px;
         font-size: 1rem;
     }
 
     /* Label tebal */
     .modal-content p strong {
         font-weight: 700;
-        color: #000;
+        color: #422f1e;
     }
 
     /* Tombol close */
     .modal-close-btn {
         position: absolute;
-        top: 12px;
-        right: 12px;
-        font-size: 1.4rem;
+        top: 14px;
+        right: 14px;
+        font-size: 1.6rem;
         border: none;
         background: none;
         cursor: pointer;
-        color: #555;
-        transition: color 0.2s ease;
+        color: #8a6d53;
+        transition: color 0.3s ease;
     }
     .modal-close-btn:hover {
-        color: #000;
+        color: #5a422a;
     }
 
     /* Label & Input form */
     label {
         display: block;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         font-weight: 600;
-        color: #444;
+        color: #5a422a;
     }
     select, input, textarea {
         width: 100%;
-        padding: 8px 12px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #c6ad92;
         font-size: 1rem;
-        font-family: inherit;
-        margin-bottom: 16px;
+        font-family: 'Georgia', serif;
+        margin-bottom: 20px;
         box-sizing: border-box;
+        color: #4a3622;
     }
 
     /* Tombol simpan dan batal */
     .btn-cancel, .btn-save {
-        padding: 10px 18px;
-        border-radius: 6px;
+        padding: 12px 24px;
+        border-radius: 8px;
         font-size: 1rem;
         cursor: pointer;
         border: none;
+        font-family: 'Georgia', serif;
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(186,142,94,0.4);
+        transition: background-color 0.3s ease;
     }
     .btn-cancel {
-        background-color: #eee;
-        color: #555;
-        margin-right: 10px;
-        transition: background-color 0.2s ease;
+        background-color: #e7ddd2;
+        color: #6d553b;
+        margin-right: 12px;
     }
     .btn-cancel:hover {
-        background-color: #ddd;
+        background-color: #d2c4b1;
     }
     .btn-save {
-        background-color: #2c7a2c;
-        color: white;
-        transition: background-color 0.2s ease;
+        background-color: #b9833b;
+        color: #fff9f1;
+        box-shadow: 0 6px 10px rgba(185,115,0,0.6);
     }
     .btn-save:hover {
-        background-color: #235d23;
+        background-color: #997a31;
     }
 </style>
 
-<div class="container mx-auto px-4 py-6" id="main-wrapper">
+<header id="header">
+    {{-- Header content here --}}
+</header>
+
+<aside id="sidebar">
+    {{-- Sidebar content here --}}
+</aside>
+
+<div id="main-wrapper" class="container mx-auto px-4 py-6">
     <h1 class="text-xl font-semibold page-title">Management Booking</h1>
 
     <table class="management-table">
@@ -213,7 +250,7 @@
             @forelse($bookings as $index => $booking)
             <tr>
                 <td>{{ $bookings->firstItem() + $index }}</td>
-                <td>{{ $booking->customer->username ?? '-' }}</td>
+                <td>{{ $booking->customer->customerProfile->name ?? '-' }}</td>
                 <td>{{ $booking->service->title ?? '-' }}</td>
                 <td>
                     <span class="status {{ $booking->status }}">
@@ -233,43 +270,6 @@
                     </button>
                 </td>
             </tr>
-
-            {{-- Modal Detail --}}
-            <div id="detail-modal-{{ $booking->id }}" class="modal-bg" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-content" role="document">
-                    <button class="modal-close-btn" aria-label="Close modal" onclick="closeModal('detail-modal-{{ $booking->id }}')">&times;</button>
-                    <h2>Detail Booking #{{ $booking->id }}</h2>
-                    <p><strong>Nama Customer:</strong> {{ $booking->customer->username ?? '-' }}</p>
-                    <p><strong>Layanan:</strong> {{ $booking->service->title ?? '-' }}</p>
-                    <p><strong>Status:</strong> {{ ucfirst($booking->status) }}</p>
-                    <p><strong>Tanggal Booking:</strong> {{ $booking->booking_date }}</p>
-                    <p><strong>Dibuat pada:</strong> {{ $booking->created_at }}</p>
-                </div>
-            </div>
-
-            {{-- Modal Edit --}}
-            <div id="edit-modal-{{ $booking->id }}" class="modal-bg" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-content" role="document">
-                    <button class="modal-close-btn" aria-label="Close modal" onclick="closeModal('edit-modal-{{ $booking->id }}')">&times;</button>
-                    <h2>Edit Booking #{{ $booking->id }}</h2>
-                    <form action="{{ route('admin.bookings.update', $booking->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <label for="status-{{ $booking->id }}">Status</label>
-                        <select name="status" id="status-{{ $booking->id }}" required>
-                            @foreach(['pending', 'confirmed', 'cancelled', 'completed', 'failed'] as $status)
-                                <option value="{{ $status }}" {{ $booking->status == $status ? 'selected' : '' }}>
-                                    {{ ucfirst($status) }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="flex justify-end">
-                            <button type="button" class="btn-cancel" onclick="closeModal('edit-modal-{{ $booking->id }}')">Batal</button>
-                            <button type="submit" class="btn-save">Simpan</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
             @empty
             <tr>
                 <td colspan="5" style="text-align:center; padding: 20px; color: #666;">Belum ada data booking.</td>
@@ -279,8 +279,50 @@
     </table>
 </div>
 
+{{-- Modal ditempatkan di luar container yang diblur --}}
+@foreach($bookings as $booking)
+<div id="detail-modal-{{ $booking->id }}" class="modal-bg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-content" role="document" aria-modal="true">
+        <button class="modal-close-btn" aria-label="Close modal" onclick="closeModal('detail-modal-{{ $booking->id }}')">&times;</button>
+        <h2>Detail Booking {{ $booking->customer->customerProfile->name }}</h2>
+        <p><strong>Nama Customer:</strong> {{ $booking->customer->customerProfile->name ?? '-' }}</p>
+        <p><strong>Layanan:</strong> {{ $booking->service->title ?? '-' }}</p>
+        <p><strong>Status:</strong> {{ ucfirst($booking->status) }}</p>
+        <p><strong>Tanggal Booking:</strong> {{ $booking->booking_date }}</p>
+        <p><strong>Dibuat pada:</strong> {{ $booking->created_at }}</p>
+    </div>
+</div>
+
+<div id="edit-modal-{{ $booking->id }}" class="modal-bg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-content" role="document" aria-modal="true">
+        <button class="modal-close-btn" aria-label="Close modal" onclick="closeModal('edit-modal-{{ $booking->id }}')">&times;</button>
+        <h2>Edit Status Booking {{ $booking->customer->customerProfile->name }}</h2>
+        <form action="{{ route('admin.bookings.update', $booking->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <label for="status-{{ $booking->id }}">Status</label>
+            <select name="status" id="status-{{ $booking->id }}" required>
+                @foreach(['pending', 'confirmed', 'cancelled', 'completed', 'failed'] as $status)
+                    <option value="{{ $status }}" {{ $booking->status == $status ? 'selected' : '' }}>
+                        {{ ucfirst($status) }}
+                    </option>
+                @endforeach
+            </select>
+            <div class="flex justify-end">
+                <button type="button" class="btn-cancel" onclick="closeModal('edit-modal-{{ $booking->id }}')">Batal</button>
+                <button type="submit" class="btn-save">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endforeach
+
 <script>
     function openModal(id) {
+        ['header', 'sidebar', 'main-wrapper', 'footer'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.add('blur');
+        });
         document.querySelectorAll('.modal-bg').forEach(modal => {
             if(modal.id === id){
                 modal.classList.add('active');
@@ -292,6 +334,10 @@
     }
 
     function closeModal(id) {
+        ['header', 'sidebar', 'main-wrapper', 'footer'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.remove('blur');
+        });
         const modal = document.getElementById(id);
         if(modal) {
             modal.classList.remove('active');
@@ -301,7 +347,7 @@
     window.addEventListener('click', function(event) {
         document.querySelectorAll('.modal-bg.active').forEach(modal => {
             if(event.target === modal) {
-                modal.classList.remove('active');
+                closeModal(modal.id);
             }
         });
     });
@@ -309,7 +355,7 @@
     window.addEventListener('keydown', function(event) {
         if(event.key === 'Escape'){
             document.querySelectorAll('.modal-bg.active').forEach(modal => {
-                modal.classList.remove('active');
+                closeModal(modal.id);
             });
         }
     });
