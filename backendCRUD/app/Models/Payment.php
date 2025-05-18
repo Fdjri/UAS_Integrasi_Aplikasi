@@ -21,4 +21,16 @@ class Payment extends Model
     {
         return $this->belongsTo(Booking::class, 'booking_id', 'id');
     }
+
+    public function customer()
+    {
+        return $this->hasOneThrough(
+            User::class,   
+            Booking::class, 
+            'id',           
+            'id',           
+            'booking_id',   
+            'customer_id'  
+        );
+    }
 }
