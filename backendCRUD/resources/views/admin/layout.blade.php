@@ -28,15 +28,10 @@
     .wrapper {
         display: flex;
         min-height: 100vh;
-        flex-direction: row; /* Ubah dari column ke row */
-    }
-    .content {
-        flex: 1;
-        display: flex;
-        background: #f9f7f2;
+        flex-direction: row;
     }
 
-    /* Sidebar */
+    /* Sidebar fixed */
     aside.sidebar {
         position: fixed;
         top: 0;
@@ -51,7 +46,16 @@
         border-right: 1px solid #ddd6c7;
         z-index: 1000;
         overflow-y: auto;
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
     }
+    aside.sidebar.collapsed {
+        transform: translateX(-260px);
+    }
+    aside.sidebar.expanded {
+        transform: translateX(0);
+    }
+
     .sidebar-header {
         padding: 20px 30px;
         border-bottom: 1px solid #ddd6c7;
@@ -104,7 +108,7 @@
         background-color: #faf7f1;
     }
     nav.sidebar-menu ul.submenu.show {
-        max-height: 400px; /* cukup untuk submenu */
+        max-height: 400px;
         border-top: 1px solid #ddd6c7;
     }
     nav.sidebar-menu ul.submenu li {
@@ -144,16 +148,21 @@
 
     /* Main content container */
     .main-wrapper {
-        margin-left: 260px; /* sesuai lebar sidebar */
+        margin-left: 260px;
         flex: 1;
         display: flex;
         flex-direction: column;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+    }
+    .main-wrapper.expanded {
+        margin-left: 0;
     }
 
     /* Main content */
     main.main-content {
         flex-grow: 1;
-        padding: 30px 40px 80px 40px; /* tambahkan padding bottom 80px */
+        padding: 30px 40px 80px 40px;
         overflow-y: auto;
         background-color: #f9f7f2;
     }
@@ -164,13 +173,26 @@
         background: white;
         border-bottom: 1px solid #ddd6c7;
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
         padding: 0 30px;
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 1010;
     }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle-btn {
+        font-size: 26px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6f5846;
+        padding: 0;
+        margin-right: 20px;
+        user-select: none;
+    }
+
     .user-menu {
         position: relative;
         display: flex;
@@ -245,6 +267,8 @@
     .user-dropdown form {
         margin: 0;
     }
+
+    /* Footer */
     .footer {
         height: 60px;
         background-color: #fdfcf9;
@@ -260,12 +284,28 @@
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
         flex-shrink: 0;
     }
+
+    /* Responsive: mobile sidebar hidden by default */
+    @media (max-width: 900px) {
+        aside.sidebar {
+            transform: translateX(-260px);
+        }
+        aside.sidebar.expanded {
+            transform: translateX(0);
+        }
+        .main-wrapper {
+            margin-left: 0 !important;
+        }
+        .main-wrapper.shifted {
+            margin-left: 260px !important;
+        }
+    }
 </style>
 </head>
 <body>
 <div class="wrapper">
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             Panel Admin
         </div>
@@ -282,9 +322,9 @@
                         <span class="dropdown-icon"></span>
                     </button>
                     <ul class="submenu" id="customer-submenu" aria-hidden="true">
-                        <li><a href="#">Management Customer</a></li>
-                        <li><a href="#">Management Booking</a></li>
-                        <li><a href="#">Management Payment</a></li>
+                        <li><a href="{{ route('admin.customers.index') }}">Management Customer</a></li>
+                        <li><a href="{{ route('admin.bookings.index') }}">Management Booking</a></li>
+                        <li><a href="{{ route('admin.payments.index') }}">Management Payment</a></li>
                     </ul>
                 </li>
 
@@ -308,9 +348,10 @@
         </div>
     </aside>
 
-    <div class="main-wrapper">
+    <div class="main-wrapper" id="mainWrapper">
 
         <header class="header">
+            <button id="sidebarToggle" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="sidebar" class="sidebar-toggle-btn">&#9776;</button>
             <div class="user-menu" id="userMenu" tabindex="0" aria-haspopup="true" aria-expanded="false">
                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->username) }}&background=6f5846&color=fff&size=36" alt="Avatar" class="user-avatar" />
                 <span class="user-name">{{ Auth::user()->username }}</span>
@@ -339,7 +380,7 @@
 </div>
 
 <script>
-    // Sidebar dropdown toggle
+    // Sidebar dropdown toggle menu
     document.querySelectorAll('.dropdown-btn').forEach(button => {
         button.addEventListener('click', () => {
             const expanded = button.getAttribute('aria-expanded') === 'true';
@@ -371,6 +412,76 @@
         if (!userMenu.contains(e.target)) {
             userDropdown.classList.remove('show');
             userMenu.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Sidebar toggle button functionality
+    const sidebar = document.getElementById('sidebar');
+    const mainWrapper = document.getElementById('mainWrapper');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    function closeSidebarMobile() {
+        if (window.innerWidth <= 900) {
+            sidebar.classList.remove('expanded');
+            mainWrapper.classList.remove('shifted');
+            toggleBtn.setAttribute('aria-expanded', false);
+        }
+    }
+
+    function openSidebarMobile() {
+        sidebar.classList.add('expanded');
+        mainWrapper.classList.add('shifted');
+        toggleBtn.setAttribute('aria-expanded', true);
+    }
+
+    // Inisialisasi sidebar sesuai ukuran layar saat load
+    window.addEventListener('load', () => {
+        if (window.innerWidth <= 900) {
+            closeSidebarMobile();
+        } else {
+            sidebar.classList.remove('expanded');
+            sidebar.classList.remove('collapsed');
+            mainWrapper.classList.remove('shifted');
+            toggleBtn.setAttribute('aria-expanded', true);
+        }
+    });
+
+    // Toggle sidebar on button click
+    toggleBtn.addEventListener('click', () => {
+        const isMobile = window.innerWidth <= 900;
+        if (isMobile) {
+            if (sidebar.classList.contains('expanded')) {
+                closeSidebarMobile();
+            } else {
+                openSidebarMobile();
+            }
+        } else {
+            // Desktop toggle behavior
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            mainWrapper.classList.toggle('expanded', isCollapsed);
+            toggleBtn.setAttribute('aria-expanded', !isCollapsed);
+        }
+    });
+
+    // Tutup sidebar mobile jika klik di luar sidebar dan tombol toggle
+    document.addEventListener('click', (e) => {
+        const isMobile = window.innerWidth <= 900;
+        if (isMobile) {
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                closeSidebarMobile();
+            }
+        }
+    });
+
+    // Resize event untuk reset class jika ubah ukuran layar
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) {
+            sidebar.classList.remove('expanded');
+            sidebar.classList.remove('collapsed');
+            mainWrapper.classList.remove('shifted');
+            toggleBtn.setAttribute('aria-expanded', true);
+        } else {
+            closeSidebarMobile();
         }
     });
 </script>
