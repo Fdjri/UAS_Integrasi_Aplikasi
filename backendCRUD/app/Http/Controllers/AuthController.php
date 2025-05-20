@@ -64,4 +64,28 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
+    
+    // Proses registrasi khusus service provider
+    public function register(Request $request)
+    {
+        // Validasi input registrasi
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        // Buat user baru dengan role service_provider
+        $user = User::create([
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'service_provider', // hanya role service_provider
+        ]);
+
+        // Login otomatis setelah registrasi
+        Auth::login($user);
+
+        return redirect()->route('provider.dashboard')->with('success', 'Registrasi berhasil, selamat datang!');
+    }
 }
