@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminCustomerController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminCustomerController;
+use App\Http\Controllers\Admin\AdminServiceProviderController;
+use App\Http\Controllers\ServiceProvider\ServiceProviderController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -29,15 +31,25 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/bookings', [AdminCustomerController::class, 'indexBookings'])->name('admin.bookings.index');
         Route::get('/bookings/{id}', [AdminCustomerController::class, 'showBooking'])->name('admin.bookings.show');
-        Route::put('/admin/bookings/{id}', [AdminCustomerController::class, 'bookingsUpdate'])->name('admin.bookings.update');
+        Route::put('/bookings/{id}', [AdminCustomerController::class, 'bookingsUpdate'])->name('admin.bookings.update');
 
         Route::get('/payments', [AdminCustomerController::class, 'indexPayments'])->name('admin.payments.index');
-        Route::put('payments/{id}', [AdminCustomerController::class, 'updatePayment'])->name('admin.payments.update');
-        Route::put('payments/{id}', [AdminCustomerController::class, 'updatePayment'])->name('admin.payments.update');
+        Route::put('/payments/{id}', [AdminCustomerController::class, 'updatePayment'])->name('admin.payments.update');
+
+        // Route Management Service Providers
+        Route::get('/service-providers', [AdminServiceProviderController::class, 'index'])->name('admin.service_providers.index');
+        Route::get('/service-providers/{id}', [AdminServiceProviderController::class, 'show'])->name('admin.service_providers.show');
     });
 
-    // Untuk service provider dashboard
-    Route::get('/provider/dashboard', function () {
-        return view('provider.dashboard');
-    })->name('provider.dashboard')->middleware('role:service_provider');
+    // Service provider routes dengan prefix dan middleware role
+    Route::prefix('provider')->middleware('role:service_provider')->group(function () {
+        // Dashboard provider
+        Route::get('/dashboard', [ServiceProviderController::class, 'index'])->name('provider.dashboard');
+
+        // Contoh route management booking dan payment untuk provider (pastikan controller dan method ada)
+        Route::get('/bookings', [ServiceProviderController::class, 'bookingsIndex'])->name('provider.bookings.index');
+        Route::get('/payments', [ServiceProviderController::class, 'paymentsIndex'])->name('provider.payments.index');
+
+        // Tambahkan route lain khusus service provider sesuai kebutuhan
+    });
 });
