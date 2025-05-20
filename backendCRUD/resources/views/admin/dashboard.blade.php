@@ -109,7 +109,7 @@
 <script>
     const paymentData = {
         labels: ['Pending', 'Paid', 'Failed', 'Refunded'],
-        datasets: [{
+        datasets: [{ 
             label: 'Jumlah Pembayaran',
             data: [
                 {{ $paymentsStatus['pending'] ?? 0 }},

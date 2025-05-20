@@ -334,7 +334,7 @@
                         <span class="dropdown-icon"></span>
                     </button>
                     <ul class="submenu" id="services-submenu" aria-hidden="true">
-                        <li><a href="#">Management Service</a></li>
+                        <li><a href="{{ route('admin.service_providers.index') }}">Management Service Providers</a></li>
                     </ul>
                 </li>
             </ul>
