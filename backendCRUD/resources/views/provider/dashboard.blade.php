@@ -69,32 +69,32 @@
   const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const bookingColors = {
-  pending: '#C1A57B',
-  confirmed: '#8C6E4A',
-  cancelled: '#5A473A',
-  completed: '#A1887F',
-  failed: '#7F6A5B'
-};
+    pending: '#C1A57B',
+    confirmed: '#8C6E4A',
+    cancelled: '#5A473A',
+    completed: '#A1887F',
+    failed: '#7F6A5B'
+  };
 
-const paymentColors = {
-  pending: '#C1A57B',
-  paid: '#8C6E4A',
-  failed: '#5A473A',
-  refunded: '#A1887F'
-};
+  const paymentColors = {
+    pending: '#C1A57B',
+    paid: '#8C6E4A',
+    failed: '#5A473A',
+    refunded: '#A1887F'
+  };
 
-const bookingLabels = Object.keys(bookingStatusData);
-const bookingData = Object.values(bookingStatusData);
-const bookingBgColors = bookingLabels.map(label => bookingColors[label] || '#999999');
+  const bookingLabels = Object.keys(bookingStatusData);
+  const bookingData = Object.values(bookingStatusData);
+  const bookingBgColors = bookingLabels.map(label => bookingColors[label] || '#999999');
 
-const paymentLabels = Object.keys(paymentStatusData);
-const paymentData = Object.values(paymentStatusData);
-const paymentBgColors = paymentLabels.map(label => paymentColors[label] || '#999999');
+  const paymentLabels = Object.keys(paymentStatusData);
+  const paymentData = Object.values(paymentStatusData);
+  const paymentBgColors = paymentLabels.map(label => paymentColors[label] || '#999999');
 
   // Pie chart status booking
   const ctxBooking = document.getElementById('bookingStatusChart').getContext('2d');
   new Chart(ctxBooking, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
       labels: bookingLabels,
       datasets: [{
@@ -111,7 +111,7 @@ const paymentBgColors = paymentLabels.map(label => paymentColors[label] || '#999
   // Pie chart status payment
   const ctxPayment = document.getElementById('paymentStatusChart').getContext('2d');
   new Chart(ctxPayment, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
       labels: paymentLabels,
       datasets: [{

@@ -100,6 +100,31 @@
         color: #6f5846;
     }
 
+    /* Dropdown submenu */
+    nav.sidebar-menu ul.submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background-color: #faf7f1;
+    }
+    nav.sidebar-menu ul.submenu.show {
+        max-height: 400px;
+        border-top: 1px solid #ddd6c7;
+    }
+    nav.sidebar-menu ul.submenu li {
+        border-bottom: none;
+    }
+    nav.sidebar-menu ul.submenu li a {
+        padding-left: 50px;
+        font-weight: 400;
+        font-size: 14px;
+        color: #7a6e5a;
+    }
+    nav.sidebar-menu ul.submenu li a:hover {
+        background-color: #e7dfce;
+        color: #6f5846;
+    }
+
     /* Footer sidebar */
     aside.sidebar .sidebar-footer {
         padding: 20px 30px;
@@ -168,6 +193,7 @@
         user-select: none;
     }
 
+    /* User menu and profile dropdown */
     .user-menu {
         position: relative;
         display: flex;
@@ -199,7 +225,6 @@
         transform: rotate(-135deg);
     }
 
-    /* Dropdown content */
     .user-dropdown {
         position: absolute;
         top: 48px;
@@ -207,7 +232,7 @@
         background: white;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         border-radius: 8px;
-        width: 160px;
+        width: 200px;
         overflow: hidden;
         opacity: 0;
         visibility: hidden;
@@ -288,10 +313,27 @@
         <nav class="sidebar-menu">
             <ul>
                 <li>
-                    <a href="{{ route('provider.bookings.index') }}">Management Booking</a>
+                    <a href="{{ route('provider.dashboard') }}">Dashboard</a>
                 </li>
                 <li>
-                    <a href="{{ route('provider.payments.index') }}">Management Payment</a>
+                    <button type="button" class="dropdown-btn" aria-expanded="false" aria-controls="customer-submenu">
+                        Customer
+                        <span class="dropdown-icon"></span>
+                    </button>
+                    <ul class="submenu" id="customer-submenu" aria-hidden="true">
+                        <li><a href="{{ route('provider.bookings.index') }}">Management Booking</a></li>
+                        <li><a href="{{ route('provider.payments.index') }}">Management Payment</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <button type="button" class="dropdown-btn" aria-expanded="false" aria-controls="services-submenu">
+                        Service
+                        <span class="dropdown-icon"></span>
+                    </button>
+                    <ul class="submenu" id="services-submenu" aria-hidden="true">
+                        <li><a href="{{ route('provider.services.index') }}">Management Service</a></li>
+                    </ul>
                 </li>
             </ul>
         </nav>
@@ -313,6 +355,7 @@
                 <span class="user-name">{{ Auth::user()->username }}</span>
                 <span class="dropdown-icon"></span>
                 <div class="user-dropdown" id="userDropdown" role="menu" aria-label="User menu">
+                    <a href="{{ route('provider.profile.index') }}">Profile</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" role="menuitem">Logout</button>
@@ -337,8 +380,22 @@
 
 <script>
     // Sidebar dropdown toggle menu
-    // (tidak ada dropdown di provider, bisa dihapus atau tetap)
-    
+    document.querySelectorAll('.dropdown-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const expanded = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', !expanded);
+
+            const submenu = document.getElementById(button.getAttribute('aria-controls'));
+            if (submenu.classList.contains('show')) {
+                submenu.classList.remove('show');
+                submenu.setAttribute('aria-hidden', 'true');
+            } else {
+                submenu.classList.add('show');
+                submenu.setAttribute('aria-hidden', 'false');
+            }
+        });
+    });
+
     // User menu dropdown toggle
     const userMenu = document.getElementById('userMenu');
     const userDropdown = document.getElementById('userDropdown');
