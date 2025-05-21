@@ -22,61 +22,50 @@ class ServiceProviderController extends Controller
     {
         $userId = auth()->id();
 
-        // Semua status booking yang ingin ditampilkan
+        // Status booking lengkap dengan default 0
         $allBookingStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'failed'];
-
-        $bookingsStatusRaw = Booking::whereHas('service', function($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })
-        ->select('status', DB::raw('count(*) as total'))
-        ->groupBy('status')
-        ->pluck('total', 'status')
-        ->toArray();
-
+        $bookingsStatusRaw = Booking::whereHas('service', fn($q) => $q->where('user_id', $userId))
+            ->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
         $bookingsStatus = [];
         foreach ($allBookingStatuses as $status) {
             $bookingsStatus[$status] = $bookingsStatusRaw[$status] ?? 0;
         }
 
-        // Semua status payment yang ingin ditampilkan
+        // Status payment lengkap dengan default 0
         $allPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
-
-        $paymentsStatusRaw = Payment::whereHas('booking.service', function($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })
-        ->select('payment_status', DB::raw('count(*) as total'))
-        ->groupBy('payment_status')
-        ->pluck('total', 'payment_status')
-        ->toArray();
-
+        $paymentsStatusRaw = Payment::whereHas('booking.service', fn($q) => $q->where('user_id', $userId))
+            ->select('payment_status', DB::raw('count(*) as total'))
+            ->groupBy('payment_status')
+            ->pluck('total', 'payment_status')
+            ->toArray();
         $paymentsStatus = [];
         foreach ($allPaymentStatuses as $status) {
             $paymentsStatus[$status] = $paymentsStatusRaw[$status] ?? 0;
         }
 
-        // Total booking per bulan
-        $monthlyBookingTotalsRaw = Booking::whereHas('service', function($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })
-        ->selectRaw('MONTH(booking_date) as month, COUNT(*) as total')
-        ->groupBy('month')
-        ->orderBy('month')
-        ->pluck('total', 'month')
-        ->toArray();
+        // Total booking per bulan, indexed 0-11
+        $monthlyBookingTotalsRaw = Booking::whereHas('service', fn($q) => $q->where('user_id', $userId))
+            ->selectRaw('MONTH(booking_date) - 1 as month, COUNT(*) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
 
-        // Total payment per bulan
-        $monthlyPaymentTotalsRaw = Payment::whereHas('booking.service', function($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })
-        ->selectRaw('MONTH(payment_date) as month, COUNT(*) as total')
-        ->groupBy('month')
-        ->orderBy('month')
-        ->pluck('total', 'month')
-        ->toArray();
+        // Total payment per bulan, indexed 0-11
+        $monthlyPaymentTotalsRaw = Payment::whereHas('booking.service', fn($q) => $q->where('user_id', $userId))
+            ->selectRaw('MONTH(payment_date) - 1 as month, COUNT(*) as total')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
 
+        // Lengkapi data bulan 0-11
         $monthlyBookingTotals = [];
         $monthlyPaymentTotals = [];
-        for ($m = 1; $m <= 12; $m++) {
+        for ($m = 0; $m < 12; $m++) {
             $monthlyBookingTotals[$m] = $monthlyBookingTotalsRaw[$m] ?? 0;
             $monthlyPaymentTotals[$m] = $monthlyPaymentTotalsRaw[$m] ?? 0;
         }
