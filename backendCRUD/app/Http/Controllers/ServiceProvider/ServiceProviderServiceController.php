@@ -55,7 +55,7 @@ class ServiceProviderServiceController extends Controller
     public function update(Request $request, $id)
     {
         $userId = Auth::id();
-        $service = Service::where('id', $id)->where('user_id', $userId)->firstOrFail();
+        $service = Service::where('service_id', $id)->where('user_id', $userId)->firstOrFail();
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -85,7 +85,7 @@ class ServiceProviderServiceController extends Controller
     public function destroy($id)
     {
         $userId = Auth::id();
-        $service = Service::where('id', $id)->where('user_id', $userId)->firstOrFail();
+        $service = Service::where('service_id', $id)->where('user_id', $userId)->firstOrFail();
 
         if ($service->photo) {
             \Storage::disk('public')->delete($service->photo);
