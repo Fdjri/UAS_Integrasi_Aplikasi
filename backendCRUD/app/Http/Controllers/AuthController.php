@@ -15,6 +15,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    // Tampilkan halaman register
     public function showRegisterForm()
     {
         return view('auth.register');
@@ -23,35 +24,48 @@ class AuthController extends Controller
     // Proses login
     public function login(Request $request)
     {
-        // Validasi input
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Cari user berdasarkan email dan role yang diperbolehkan
         $user = User::where('email', $request->email)
-            ->whereIn('role', ['admin', 'service_provider'])
+            ->whereIn('role', ['admin', 'service_provider', 'customer'])
             ->first();
 
-        // Cek apakah user ada dan password sesuai
-        if ($user && Hash::check($request->password, $user->password)) {
-            Auth::login($user);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Email atau password salah, atau Anda tidak punya akses.',
+            ], 401);
+        }
 
-            // Redirect sesuai role
+        // Jika admin atau service_provider: redirect ke dashboard (web)
+        if (in_array($user->role, ['admin', 'service_provider'])) {
+            Auth::login($user);
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             }
-
             if ($user->role === 'service_provider') {
                 return redirect()->route('provider.dashboard');
             }
         }
 
-        // Jika gagal login
-        return back()->withErrors([
-            'email' => 'Email atau password salah, atau Anda tidak punya akses.',
-        ])->withInput();
+        // Jika customer: buat token API dan kembalikan JSON (untuk SPA frontend)
+        if ($user->role === 'customer') {
+            $user->tokens()->delete();
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user,
+                'message' => 'Login berhasil',
+            ]);
+        }
+
+        // Fallback (jika ada role lain tidak diketahui)
+        return response()->json([
+            'message' => 'Role tidak dikenal',
+        ], 403);
     }
 
     // Logout user
@@ -87,5 +101,29 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->route('provider.dashboard')->with('success', 'Registrasi berhasil, selamat datang!');
+    }
+
+    // Proses registrasi customer
+    public function registerCustomer(Request $request)
+    {
+        // Validasi input registrasi
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        // Buat user baru dengan role customer
+        $user = User::create([
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'customer', // hanya role customer
+        ]);
+
+        // Login otomatis setelah registrasi
+        Auth::login($user);
+
+        return redirect()->route('customer.dashboard')->with('success', 'Registrasi berhasil, selamat datang!');
     }
 }

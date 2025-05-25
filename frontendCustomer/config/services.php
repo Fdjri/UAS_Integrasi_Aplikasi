@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+    'backend' => [
+        'url' => env('BACKEND_API_URL', 'http://127.0.0.1:8000/api'),
+    ],
 
 ];
