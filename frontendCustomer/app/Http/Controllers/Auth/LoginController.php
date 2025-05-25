@@ -63,9 +63,6 @@ class LoginController extends Controller
         if (isset($user['role']) && $user['role'] === 'customer') {
             return redirect()->route('customer.landingpage');
         }
-
-        // Role lain (admin/service_provider) biarkan ke landing umum
-        return redirect()->intended(route('landing'));
     }
 
     // Logout: hapus session

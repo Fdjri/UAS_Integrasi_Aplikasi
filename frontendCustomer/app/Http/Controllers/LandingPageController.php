@@ -9,28 +9,27 @@ use Illuminate\Support\Facades\Session;
 class LandingPageController extends Controller
 {
     public function landingPage()
-    {
-        // Base URL API yang sudah kamu definisikan di config/services.php
-        $apiBase = config('services.backend.url');
+{
+    $services = [];
 
-        // Coba ambil daftar services dari backend
-        try {
-            // Jika butuh token:
-            $response = Http::withToken(Session::get('token'))
-                            ->get("{$apiBase}/services");
+    // Ambil token dari session untuk autentikasi API jika perlu
+    $token = session('token');
 
-            if ($response->successful()) {
-                // Asumsikan API mereturn { data: […] }
-                $services = $response->json('data', []);
-            } else {
-                $services = [];
-            }
-        } catch (\Exception $e) {
-            // kalau error koneksi/API
-            $services = [];
+    $apiBase = config('services.backend.url');
+
+    try {
+        $response = Http::withToken($token)->get("{$apiBase}/services");
+
+        if ($response->successful()) {
+            $services = $response->json('data', []);
         }
-
-        // Kirim $services ke view
-        return view('customer.landingpage', compact('services'));
+    } catch (\Exception $e) {
+        $services = [];
     }
+
+    $user = session('user');
+
+    return view('customer.landingpage', compact('services', 'user'));
+}
+
 }

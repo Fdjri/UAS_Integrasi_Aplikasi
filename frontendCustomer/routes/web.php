@@ -6,8 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
 // Halaman landing page umum
-Route::get('/', [LandingPageController::class, 'landingPage'])
-    ->name('landing');
+Route::get('/', [LandingPageController::class, 'landingPage'])->name('landing');
 
 // Auth: Login & Logout
 Route::get('/login',  [LoginController::class, 'showLoginForm'])
@@ -22,6 +21,5 @@ Route::get('/register',  [RegisterController::class, 'showRegistrationForm'])
 Route::post('/register', [RegisterController::class, 'register']);
 
 // Landing page khusus Customer (setelah login)
-Route::get('/customer/landing', function () {
-    return view('customer.landingpage');
-})->name('customer.landingpage');
+Route::get('/customer/landing', [LandingPageController::class, 'landingPage'])
+    ->name('customer.landingpage');
