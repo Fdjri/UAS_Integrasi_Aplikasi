@@ -50,7 +50,7 @@ class ServiceProviderProfileController extends Controller
             'company_name' => ['required', 'string', 'max:255'],
             'business_phone' => ['required', 'string', 'max:20'],
             'business_address' => ['required', 'string', 'max:500'],
-            'service_type' => ['required', 'string', 'max:255'],
+            // 'service_type' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', 'confirmed', 'min:6'],
         ]);
@@ -68,7 +68,7 @@ class ServiceProviderProfileController extends Controller
         $profile->company_name = $request->company_name;
         $profile->business_phone = $request->business_phone;
         $profile->business_address = $request->business_address;
-        $profile->service_type = $request->service_type;
+        // $profile->service_type = $request->service_type;
         $profile->save();
 
         return redirect()->route('provider.profile.index')->with('success', 'Profil berhasil diperbarui.');

@@ -205,11 +205,6 @@
   </div>
 
   <div class="profile-item">
-    <div class="profile-label">Service Type</div>
-    <div class="profile-value">{{ $profile->service_type ?? '-' }}</div>
-  </div>
-
-  <div class="profile-item">
     <div class="profile-label">Business Phone</div>
     <div class="profile-value">{{ $profile->business_phone ?? '-' }}</div>
   </div>
@@ -233,9 +228,6 @@
 
       <label for="company_name">Company Name</label>
       <input type="text" name="company_name" id="company_name" value="{{ old('company_name', $profile->company_name ?? '') }}" required>
-
-      <label for="service_type">Service Type</label>
-      <input type="text" name="service_type" id="service_type" value="{{ old('service_type', $profile->service_type ?? '') }}" required>
 
       <label for="business_phone">Business Phone</label>
       <input type="text" name="business_phone" id="business_phone" value="{{ old('business_phone', $profile->business_phone ?? '') }}" required>

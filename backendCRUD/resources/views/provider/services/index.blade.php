@@ -267,6 +267,7 @@
     <tr>
       <th style="width: 40px;">No</th>
       <th>Judul</th>
+      <th>Tipe Layanan</th>
       <th>Deskripsi</th>
       <th>Harga</th>
       <th style="width: 140px;">Aksi</th>
@@ -277,6 +278,7 @@
     <tr>
       <td>{{ $services->firstItem() + $index }}</td>
       <td>{{ $service->title }}</td>
+      <td>{{ $service->service_type }}</td>
       <td>{{ Str::limit($service->description, 50, '...') }}</td>
       <td>Rp {{ number_format($service->price, 0, ',', '.') }}</td>
       <td>
@@ -317,6 +319,17 @@
       <label for="price_add">Harga</label>
       <input type="number" name="price" id="price_add" required min="0" step="any">
 
+      <label for="service_type_add">Tipe Layanan</label>
+      <select name="service_type" id="service_type_add" required>
+        <option value="" disabled selected>Pilih tipe layanan</option>
+        <option value="hotel">Hotel</option>
+        <option value="event">Event</option>
+        <option value="transportasi">Transportasi</option>
+      </select>
+
+      <label for="service_address_add">Alamat Layanan</label>
+      <input type="text" name="service_address" id="service_address_add">
+
       <label for="photo_add">Foto (opsional)</label>
       <input type="file" name="photo" id="photo_add" accept="image/*">
 
@@ -334,13 +347,14 @@
     <p><strong>Judul:</strong> {{ $service->title }}</p>
     <p><strong>Deskripsi:</strong> {{ $service->description ?? '-' }}</p>
     <p><strong>Harga:</strong> Rp {{ number_format($service->price, 0, ',', '.') }}</p>
+    <p><strong>Tipe Layanan:</strong> {{ ucfirst($service->service_type ?? '-') }}</p>
+    <p><strong>Alamat Layanan:</strong> {{ $service->service_address ?? '-' }}</p>
     <p><strong>Foto:</strong></p>
-        @if($service->photo)
+    @if($service->photo)
         <img src="{{ asset('storage/' . $service->photo) }}" alt="Foto layanan" style="max-width: 100%; max-height: 200px; border-radius: 12px; display: block; margin-top: 8px;">
-        @else
-      -
-      @endif
-    </p>
+    @else
+        -
+    @endif
   </div>
 </div>
 @endforeach
@@ -362,6 +376,16 @@
 
       <label for="price_edit_{{ $service->service_id }}">Harga</label>
       <input type="number" name="price" id="price_edit_{{ $service->service_id }}" value="{{ old('price', $service->price) }}" required min="0" step="any">
+
+      <label for="service_type_edit_{{ $service->service_id }}">Tipe Layanan</label>
+      <select name="service_type" id="service_type_edit_{{ $service->service_id }}" required>
+        <option value="hotel" {{ old('service_type', $service->service_type) === 'hotel' ? 'selected' : '' }}>Hotel</option>
+        <option value="event" {{ old('service_type', $service->service_type) === 'event' ? 'selected' : '' }}>Event</option>
+        <option value="transportasi" {{ old('service_type', $service->service_type) === 'transportasi' ? 'selected' : '' }}>Transportasi</option>
+      </select>
+
+      <label for="service_address_edit_{{ $service->service_id }}">Alamat Layanan</label>
+      <input type="text" name="service_address" id="service_address_edit_{{ $service->service_id }}" value="{{ old('service_address', $service->service_address) }}">
 
       <label for="photo_edit_{{ $service->service_id }}">Foto (opsional)</label>
       <input type="file" name="photo" id="photo_edit_{{ $service->service_id }}" accept="image/*">

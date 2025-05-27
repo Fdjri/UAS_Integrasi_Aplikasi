@@ -4,62 +4,70 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Service;
 
 class CustomerServiceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mengembalikan data layanan berdasarkan service_type yang diminta.
+     * Endpoint publik, tanpa autentikasi.
      */
-    public function index()
+    public function publicServices(Request $request)
     {
-        //
+        $serviceType = $request->input('service_type', null);
+
+        $query = Service::with('providerProfile');
+
+        if ($serviceType) {
+            // Filter berdasarkan service_type dari relasi providerProfile
+            $query->whereHas('providerProfile', function ($q) use ($serviceType) {
+                $q->where('service_type', ucfirst($serviceType)); // Contoh: 'Hotel', 'Event', 'Transportasi'
+            });
+        }
+
+        $services = $query->get();
+
+        // Transform hasil agar photo_url lengkap dan sesuai frontend
+        $services->transform(function ($service) {
+            return [
+                'service_id' => $service->service_id,
+                'title' => $service->title,
+                'price' => $service->price,
+                'photo_url' => $service->photo ? asset('storage/' . $service->photo) : asset('images/bg1.jpg'),
+                'service_address' => $service->service_address ?? null,
+            ];
+        });
+
+        return response()->json(['services' => $services]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Endpoint dengan autentikasi, misal untuk user login.
+     * Bisa diakses lewat middleware auth:sanctum.
      */
-    public function create()
+    public function index(Request $request)
     {
-        //
-    }
+        $query = Service::with('providerProfile');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($request->filled('service_type')) {
+            $serviceType = $request->input('service_type');
+            $query->whereHas('providerProfile', function ($q) use ($serviceType) {
+                $q->where('service_type', ucfirst($serviceType));
+            });
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $services = $query->get();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $services->transform(function ($service) {
+            return [
+                'service_id' => $service->service_id,
+                'title' => $service->title,
+                'price' => $service->price,
+                'photo_url' => $service->photo ? asset('storage/' . $service->photo) : asset('images/bg1.jpg'),
+                'service_address' => $service->service_address ?? null,
+            ];
+        });
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json(['services' => $services]);
     }
 }

@@ -13,7 +13,7 @@ class ServiceProviderProfile extends Model
         'company_name',
         'business_phone',
         'business_address',
-        'service_type',
+        // 'service_type',
     ];
 
     public function user()

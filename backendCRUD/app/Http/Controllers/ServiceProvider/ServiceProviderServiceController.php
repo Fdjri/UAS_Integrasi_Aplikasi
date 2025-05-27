@@ -33,6 +33,8 @@ class ServiceProviderServiceController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'photo' => 'nullable|image|max:2048',
+            'service_type' => 'required|in:hotel,transportasi,event',
+            'service_address' => 'nullable|string|max:255',
         ]);
 
         $service = new Service();
@@ -40,6 +42,8 @@ class ServiceProviderServiceController extends Controller
         $service->title = $request->title;
         $service->description = $request->description;
         $service->price = $request->price;
+        $service->service_type = $request->service_type;
+        $service->service_address = $request->service_address;
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('services', 'public');
@@ -62,11 +66,15 @@ class ServiceProviderServiceController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'photo' => 'nullable|image|max:2048',
+            'service_type' => 'required|in:hotel,transportasi,event',
+            'service_address' => 'nullable|string|max:255',
         ]);
 
         $service->title = $request->title;
         $service->description = $request->description;
         $service->price = $request->price;
+        $service->service_type = $request->service_type;
+        $service->service_address = $request->service_address;
 
         if ($request->hasFile('photo')) {
             if ($service->photo) {
