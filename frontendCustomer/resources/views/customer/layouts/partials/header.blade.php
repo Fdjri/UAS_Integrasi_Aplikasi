@@ -39,10 +39,8 @@
         </div>
         <ul style="list-style:none; padding:0; margin:0;">
           {{-- menu items --}}
+          <li><a href="#" style="display:block; padding:0.75rem 1rem; color:#333; text-decoration:none; border-bottom:1px solid #eee;">Profile</a></li>
           <li><a href="#" style="display:block; padding:0.75rem 1rem; color:#333; text-decoration:none; border-bottom:1px solid #eee;">Pesanan Kamu</a></li>
-          <li><a href="#" style="display:block; padding:0.75rem 1rem; color:#333; text-decoration:none; border-bottom:1px solid #eee;">Simpan Data Penumpang</a></li>
-          <li><a href="#" style="display:block; padding:0.75rem 1rem; color:#333; text-decoration:none; border-bottom:1px solid #eee;">Voucher Box</a></li>
-          <li><a href="#" style="display:block; padding:0.75rem 1rem; color:#333; text-decoration:none; border-bottom:1px solid #eee;">Metode Pembayaran</a></li>
           <li><a href="#" style="display:block; padding:0.75rem 1rem; color:#333; text-decoration:none; border-bottom:1px solid #eee;">Daftar Refund</a></li>
           <li>
             <form action="{{ route('logout') }}" method="POST" style="margin:0;">

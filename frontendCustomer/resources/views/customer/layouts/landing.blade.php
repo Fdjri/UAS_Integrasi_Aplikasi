@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>@yield('title', 'TixGo')</title>
-  <link href="{{ mix('css/app.css') }}" rel="stylesheet" />
+  
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-  {{-- Google Fonts Poppins --}}
+  {{-- Google Fonts --}}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -25,13 +26,13 @@
       background-color: #f9fafb;
     }
     main.container {
-      flex: 1 0 auto; /* Isi konten mengembang dan mengambil ruang */
+      flex: 1 0 auto;
       max-width: 1200px;
       margin: 30px auto;
       padding: 0 20px;
     }
     footer {
-      flex-shrink: 0; /* Footer tidak mengecil */
+      flex-shrink: 0;
       max-width: 1100px;
       margin: 0 auto 30px;
       text-align: center;
@@ -50,6 +51,5 @@
 
   @include('customer.layouts.partials.footer')
 
-  <script src="{{ mix('js/app.js') }}"></script>
 </body>
 </html>
