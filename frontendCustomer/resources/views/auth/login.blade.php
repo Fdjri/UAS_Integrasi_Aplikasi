@@ -196,6 +196,16 @@
     <button type="submit" class="login-btn">Log in</button>
   </form>
 
+  @if ($errors->any())
+    <div class="alert alert-danger">
+      <ul>
+        @foreach ($errors->all() as $error)
+          <li>{{ $error }}</li>
+        @endforeach
+      </ul>
+    </div>
+  @endif
+
   <div class="quick-login">
     <div>Log in lebih cepat dengan</div>
     <div class="icons" aria-label="Login dengan Google dan Facebook">

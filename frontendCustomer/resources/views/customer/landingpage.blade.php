@@ -57,6 +57,38 @@
 </div>
 
 <style>
+.service-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+
+  /* Animasi saat pertama kali muncul */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+
+  /* Transisi untuk animasi hover */
+  transition: box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Hover dan fokus: timbul halus dan naik sedikit */
+.service-card:hover,
+.service-card:focus-within {
+  box-shadow: 0 8px 22px rgb(0 0 0 / 0.2);
+  opacity: 1;
+  transform: translateY(0) scale(1.03);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .category-tabs {
     max-width: 900px;
     margin: 30px auto 20px;

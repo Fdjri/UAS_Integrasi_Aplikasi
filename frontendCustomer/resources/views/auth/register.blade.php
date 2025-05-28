@@ -138,6 +138,7 @@
       <input type="text" name="username" placeholder="Username*" required aria-required="true" autocomplete="username" />
       <input type="email" name="email" placeholder="Email*" required aria-required="true" autocomplete="email" />
       <input type="password" name="password" placeholder="Kata Sandi*" required aria-required="true" autocomplete="new-password" />
+      <input type="password" name="password_confirmation" placeholder="Konfirmasi Kata Sandi*" required aria-required="true" autocomplete="new-password" />
       <button type="submit" class="register-btn">Daftar</button>
     </form>
 

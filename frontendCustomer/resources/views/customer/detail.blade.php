@@ -1,34 +1,138 @@
 @extends('customer.layouts.landing')
 
-@section('title', 'Detail Layanan')
+@section('title', $service['title'] ?? 'Detail Service')
 
 @section('content')
-<div style="max-width: 900px; margin: 40px auto; background-color: #d3d3d3; padding: 20px; display: flex; gap: 24px; align-items: center; border-radius: 12px;">
-
-    <div style="flex-shrink: 0;">
-        <img src="{{ asset('images/bg1.jpg') }}" alt="Monoloog Hotel Bekasi" style="width: 250px; border-radius: 12px;" />
-    </div>
-
-    <div style="flex-grow: 1; padding-left: 12px;">
-        <h2 style="text-align: center; margin-bottom: 20px; font-weight: 700;">Monoloog Hotel Bekasi</h2>
-
-        <div style="margin-bottom: 16px; font-weight: 600;">Address</div>
-        <p style="margin-bottom: 24px;">Jl. Contoh Alamat No. 123, Bekasi, Jawa Barat</p>
-
-        <div style="margin-bottom: 16px; font-weight: 600;">Description</div>
-        <p style="margin-bottom: 24px;">
-            Hotel bintang 5 dengan fasilitas lengkap dan pelayanan terbaik, cocok untuk bisnis dan liburan keluarga.
-        </p>
-
-        <div style="font-weight: 700; font-size: 1.5rem; margin-bottom: 20px;">Rp 250.600</div>
-
-        <button 
-            onclick="window.location.href='{{ url('customer/booking') }}'"
-            style="background-color: #7a9eea; color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 1rem;"
-        >
-            Book Now
-        </button>
-    </div>
-
+<!-- Tombol kembali di luar wrapper -->
+<div class="back-wrapper">
+    <button class="btn-back" onclick="window.history.back()">
+        &larr; Kembali
+    </button>
 </div>
+
+<div class="detail-container">
+    <div class="detail-sidebar">
+        <div class="detail-image">
+            <img src="{{ asset($service['photo_url'] ?? 'images/bg1.jpg') }}" alt="{{ $service['title'] ?? 'Service Image' }}" />
+        </div>
+    </div>
+
+    <div class="detail-info">
+        <h2 class="title">{{ $service['title'] ?? 'Service Title' }}</h2>
+        <p class="address"><strong>Address</strong><br>{{ $service['service_address'] ?? '-' }}</p>
+        <p class="description"><strong>Desc</strong><br>{{ $service['description'] ?? '-' }}</p>
+
+        <div class="footer-info">
+            <div class="price">Rp {{ number_format($service['price'] ?? 0, 0, ',', '.') }}</div>
+            <button class="btn-book-now"
+                onclick="window.location.href='{{ route('customer.booking') }}'">
+                Book Now
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.back-wrapper {
+    max-width: 1100px;
+    margin: 30px auto 10px;
+    padding: 0 20px;
+    display: flex;
+}
+.btn-back {
+    background-color: transparent;
+    border: 1.5px solid #888;
+    padding: 6px 16px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.btn-back:hover {
+    background-color: #e0e0e0;
+}
+
+.detail-container {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    padding: 30px;
+    background-color: #e2e2e2;
+    border-radius: 12px;
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+.detail-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.detail-image img {
+    width: 280px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.detail-info {
+    flex: 1;
+}
+.title {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+.address, .description {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+.footer-info {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.price {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #b33527;
+}
+.btn-book-now {
+    background-color: #7aa9f7;
+    border: none;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.btn-book-now:hover {
+    background-color: #5a88e6;
+}
+
+@media (max-width: 768px) {
+    .detail-container {
+        flex-direction: column;
+        padding: 20px;
+        text-align: center;
+    }
+    .detail-sidebar {
+        align-items: center;
+    }
+    .detail-image img {
+        width: 100%;
+        max-width: 400px;
+    }
+    .footer-info {
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 30px;
+    }
+    .btn-back {
+        align-self: center;
+    }
+}
+</style>
 @endsection

@@ -14,4 +14,5 @@ Route::get('services/public', [CustomerServiceController::class, 'publicServices
 // Route dengan middleware autentikasi Sanctum, untuk user yang sudah login
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('services', [CustomerServiceController::class, 'index']);
+    Route::get('services/{serviceId}', [CustomerServiceController::class, 'show']);
 });

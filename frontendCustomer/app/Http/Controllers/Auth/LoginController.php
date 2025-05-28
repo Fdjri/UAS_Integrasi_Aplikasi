@@ -18,51 +18,53 @@ class LoginController extends Controller
     // Proses login: kirim data ke API backendCRUD
     public function login(Request $request)
     {
-        // Validasi input: pakai email & password
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
         ]);
 
-        // Baca base URL dari config/services.php (services.backend.url)
         $apiBase = config('services.backend.url');
 
-        // Kirim POST ke http://127.0.0.1:8000/api/login
         $response = Http::post("{$apiBase}/login", [
             'email'    => $request->input('email'),
             'password' => $request->input('password'),
         ]);
 
-        // Jika gagal, kembali dengan error
-        if (! $response->successful()) {
-            return back()->withErrors([
-                'email' => 'Login gagal, silakan periksa kembali email & password Anda.'
-            ]);
+        if (!$response->successful()) {
+            $message = $response->json('message', 'Login gagal, silakan coba lagi.');
+            return back()->withErrors(['email' => $message])->withInput();
         }
 
-        // Ambil respons JSON
         $data = $response->json();
 
-        // Token & user data sesuai respons API Anda
         $token = $data['access_token'] ?? null;
-        $user  = $data['user']         ?? null;
+        $user  = $data['user'] ?? null;
 
-        if (! $token) {
+        if (!$token) {
             return back()->withErrors([
                 'email' => 'Login gagal: token tidak ditemukan pada respons API.'
-            ]);
+            ])->withInput();
         }
 
-        // Simpan ke session
+        // Simpan token dan data user di session untuk autentikasi frontend
         Session::put('token', $token);
         if ($user) {
             Session::put('user', $user);
         }
 
-        // Redirect berdasar role
+        // **Tambahkan login Laravel agar middleware 'auth' mengenali user**
+        if ($user) {
+            $userModel = \App\Models\User::where('email', $user['email'])->first();
+            if ($userModel) {
+                \Illuminate\Support\Facades\Auth::login($userModel);
+            }
+        }
+
         if (isset($user['role']) && $user['role'] === 'customer') {
             return redirect()->route('customer.landingpage');
         }
+
+        return redirect()->route('landing');
     }
 
     // Logout: hapus session

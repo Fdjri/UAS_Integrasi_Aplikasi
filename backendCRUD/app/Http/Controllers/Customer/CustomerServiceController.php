@@ -70,4 +70,30 @@ class CustomerServiceController extends Controller
 
         return response()->json(['services' => $services]);
     }
+
+    public function show($serviceId)
+    {
+        $service = Service::with('providerProfile')->find($serviceId);
+
+        if (!$service) {
+            return response()->json(['message' => 'Service not found'], 404);
+        }
+
+        $serviceData = [
+            'service_id' => $service->service_id,
+            'title' => $service->title,
+            'description' => $service->description,
+            'price' => $service->price,
+            'photo_url' => $service->photo ? asset('storage/' . $service->photo) : asset('images/bg1.jpg'),
+            'service_address' => $service->service_address ?? null,
+            'provider' => $service->providerProfile ? [
+                'company_name' => $service->providerProfile->company_name ?? null,
+                'business_phone' => $service->providerProfile->business_phone ?? null,
+                'business_address' => $service->providerProfile->business_address ?? null,
+            ] : null,
+        ];
+
+        return response()->json(['service' => $serviceData]);
+    }
+
 }
