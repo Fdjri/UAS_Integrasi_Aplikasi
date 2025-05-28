@@ -5,6 +5,8 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DetailController;
+use App\Http\Controllers\Customer\CustomerProfileFrontendController;
+use App\Http\Controllers\Customer\CustomerBookingFrontendController; // Jika ada controller frontend booking
 
 // Halaman landing page umum (bisa untuk guest dan user login)
 Route::get('/', [LandingPageController::class, 'landingPage'])->name('landing');
@@ -26,8 +28,16 @@ Route::middleware('auth')->group(function () {
     // Detail service dengan parameter serviceId
     Route::get('/customer/detail/{serviceId}', [DetailController::class, 'show'])->name('customer.detail');
 
-    // Halaman lain khusus customer
-    Route::view('/customer/booking', 'customer.booking')->name('customer.booking');
-    Route::view('/customer/payment', 'customer.payment')->name('customer.payment');
-    Route::view('/customer/success', 'customer.success')->name('customer.success');
+    // Halaman profile customer (frontend consuming API)
+    Route::get('/customer/profile', [CustomerProfileFrontendController::class, 'index'])->name('customer.profile.frontend');
+    Route::put('/customer/profile', [CustomerProfileFrontendController::class, 'update'])->name('customer.profile.update.frontend');
+
+    // Halaman booking customer (frontend consuming API)
+    Route::get('/customer/bookings', [CustomerBookingFrontendController::class, 'index'])->name('customer.bookings.index');
+    Route::get('/customer/bookings/history', [CustomerBookingFrontendController::class, 'history'])->name('customer.bookings.history');
+
+    // Jika kamu pakai view langsung, contoh:
+    // Route::view('/customer/booking', 'customer.booking')->name('customer.booking');
+    // Route::view('/customer/payment', 'customer.payment')->name('customer.payment');
+    // Route::view('/customer/success', 'customer.success')->name('customer.success');
 });
