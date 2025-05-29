@@ -46,25 +46,21 @@ class LoginController extends Controller
             ])->withInput();
         }
 
-        // Simpan token dan data user di session untuk autentikasi frontend
-        Session::put('token', $token);
+        // ✅ SIMPAN TOKEN KE SESSION
+        session(['token' => $token]);
+
+        // Opsional: Simpan user juga
         if ($user) {
-            Session::put('user', $user);
+            session(['user' => $user]);
         }
 
-        // **Tambahkan login Laravel agar middleware 'auth' mengenali user**
-        if ($user) {
-            $userModel = \App\Models\User::where('email', $user['email'])->first();
-            if ($userModel) {
-                \Illuminate\Support\Facades\Auth::login($userModel);
-            }
+        // Login juga via Laravel auth lokal (agar Auth::user() tetap ada)
+        $userModel = \App\Models\User::where('email', $user['email'])->first();
+        if ($userModel) {
+            \Illuminate\Support\Facades\Auth::login($userModel);
         }
 
-        if (isset($user['role']) && $user['role'] === 'customer') {
-            return redirect()->route('customer.landingpage');
-        }
-
-        return redirect()->route('landing');
+        return redirect()->route('customer.landingpage');
     }
 
     // Logout: hapus session

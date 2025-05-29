@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\CustomerProfile;
 
 class AuthController extends Controller
 {
@@ -109,11 +110,13 @@ class AuthController extends Controller
     public function registerCustomer(Request $request)
     {
         $request->validate([
+            'name' => ['required', 'string', 'max:255'], // nama untuk customer_profiles
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+        // Simpan ke tabel users
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
@@ -121,7 +124,16 @@ class AuthController extends Controller
             'role' => 'customer',
         ]);
 
-        // Opsi: bisa juga langsung buat token untuk login otomatis
+        // Simpan ke tabel customer_profiles
+        CustomerProfile::create([
+            'user_id' => $user->id,
+            'name' => $request->name,
+            'address' => null,
+            'phone_number' => null,
+            'birth_date' => null,
+        ]);
+
+        // Buat token login otomatis
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
