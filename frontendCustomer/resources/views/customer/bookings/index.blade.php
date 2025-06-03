@@ -1,104 +1,34 @@
-@extends('customer.layouts.landing')
+@extends('customer.applayout')
 
-@section('title', 'Booking')
+@section('title', 'Pemesanan')
 
 @section('content')
-<style>
-  .booking-container {
-    max-width: 900px;
-    margin: 40px auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    font-family: 'Poppins', sans-serif;
-  }
-  .choose-date {
-    background-color: #ccc;
-    flex: 1 1 350px;
-    height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.5rem;
-    border-radius: 12px;
-  }
-  .detail-info {
-    background-color: #ccc;
-    flex: 1 1 500px;
-    display: flex;
-    gap: 16px;
-    border-radius: 12px;
-    padding: 12px;
-  }
-  .detail-info img {
-    width: 160px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 12px;
-  }
-  .detail-text {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .detail-text h3 {
-    margin: 0 0 12px 0;
-    font-weight: 700;
-  }
-  .detail-text p {
-    margin: 0;
-  }
-  .footer-booking {
-    margin-top: 40px;
-    background-color: #ccc;
-    border-radius: 12px;
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .price {
-    font-weight: 700;
-    font-size: 1.5rem;
-  }
-  .btn-continue {
-    background-color: #7a9eea;
-    border: none;
-    padding: 10px 30px;
-    color: white;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  .btn-continue:hover {
-    background-color: #6078c9;
-  }
-</style>
-
-<div class="booking-container">
-  <div class="choose-date">
-    Choose date
-  </div>
-
-  <div class="detail-info">
-    <img src="{{ asset('images/bg1.jpg') }}" alt="Monoloog Hotel Bekasi" />
-    <div class="detail-text">
-      <h3>Monoloog Hotel Bekasi</h3>
-      <p>Address</p>
+<div class="bg-gray-300 rounded-lg p-6">
+    <h3 class="font-semibold mb-4">Detail Pemesanan</h3>
+    <div class="bg-gray-100 rounded-lg p-6 flex flex-col md:flex-row gap-6 items-center md:items-start">
+      <img
+        src="{{ asset('images/hotel-bekasi.jpg') }}"
+        alt="Monoloog Hotel Bekasi"
+        class="w-40 h-56 rounded-lg object-cover shadow-md"
+      />
+      <div class="flex flex-col gap-2 flex-grow">
+        <h4 class="font-semibold text-lg">Monoloog Hotel Bekasi</h4>
+        <p>Service_address</p>
+        <p>Tanggal booking</p>
+        <p>Detail Customer</p>
+      </div>
     </div>
-  </div>
 
-  <div class="footer-booking" style="width: 100%;">
-    <div class="price">Rp 250.600</div>
-    <button 
-        class="btn-continue" 
-        aria-label="Continue Booking"
-        onclick="window.location.href='{{ url('customer/payment') }}'"
-    >
-        Continue
-    </button>
-  </div>
+    <div class="flex justify-between items-center mt-6">
+      <p class="font-bold text-xl">Rp. 250.600</p>
+      <div class="flex gap-4">
+        <button class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+          Hapus
+        </button>
+        <button class="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-6 py-2 rounded-lg transition">
+          Lanjut Bayar
+        </button>
+      </div>
+    </div>
 </div>
 @endsection

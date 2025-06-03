@@ -3,136 +3,53 @@
 @section('title', $service['title'] ?? 'Detail Service')
 
 @section('content')
-<!-- Tombol kembali di luar wrapper -->
-<div class="back-wrapper">
-    <button class="btn-back" onclick="window.history.back()">
+{{-- Tombol kembali --}}
+<div class="max-w-[1100px] mx-auto mt-8 mb-3 px-5 flex">
+    <button 
+        onclick="window.history.back()" 
+        class="border border-gray-500 text-gray-700 px-4 py-1.5 rounded-md text-sm font-medium hover:bg-gray-300 transition">
         &larr; Kembali
     </button>
 </div>
 
-<div class="detail-container">
-    <div class="detail-sidebar">
-        <div class="detail-image">
-            <img src="{{ asset($service['photo_url'] ?? 'images/bg1.jpg') }}" alt="{{ $service['title'] ?? 'Service Image' }}" />
-        </div>
+{{-- Container detail --}}
+<div class="max-w-[1100px] mx-auto bg-gray-200 rounded-xl p-8 flex gap-8 items-start flex-col md:flex-row px-5 md:px-8">
+
+    {{-- Sidebar gambar --}}
+    <div class="flex flex-col gap-4 items-center md:items-start">
+        <img 
+            src="{{ asset($service['photo_url'] ?? 'images/bg1.jpg') }}" 
+            alt="{{ $service['title'] ?? 'Service Image' }}" 
+            class="w-[280px] rounded-xl object-cover shadow-lg max-w-full" />
     </div>
 
-    <div class="detail-info">
-        <h2 class="title">{{ $service['title'] ?? 'Service Title' }}</h2>
-        <p class="address"><strong>Address</strong><br>{{ $service['service_address'] ?? '-' }}</p>
-        <p class="description"><strong>Desc</strong><br>{{ $service['description'] ?? '-' }}</p>
+    {{-- Info detail --}}
+    <div class="flex-1">
+        <h2 class="text-3xl font-extrabold mb-6 text-gray-900">
+            {{ $service['title'] ?? 'Service Title' }}
+        </h2>
 
-        <div class="footer-info">
-            <div class="price">Rp {{ number_format($service['price'] ?? 0, 0, ',', '.') }}</div>
-            <button class="btn-book-now"
-                onclick="window.location.href='{{ route('customer.booking') }}'">
+        <p class="text-lg mb-6 text-gray-800">
+            <strong>Address</strong><br>
+            {{ $service['service_address'] ?? '-' }}
+        </p>
+
+        <p class="text-lg mb-10 text-gray-800">
+            <strong>Description</strong><br>
+            {{ $service['description'] ?? '-' }}
+        </p>
+
+        {{-- Footer info: price dan tombol --}}
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6 md:gap-0">
+            <div class="text-2xl font-bold text-red-700">
+                Rp {{ number_format($service['price'] ?? 0, 0, ',', '.') }}
+            </div>
+            <button 
+                onclick="window.location.href='{{ route('customer.bookings.init.form', ['service_id' => $service['service_id']]) }}'" 
+                class="bg-blue-400 hover:bg-blue-600 transition text-white font-semibold rounded-lg px-8 py-3 text-lg cursor-pointer">
                 Book Now
             </button>
         </div>
     </div>
 </div>
-
-<style>
-.back-wrapper {
-    max-width: 1100px;
-    margin: 30px auto 10px;
-    padding: 0 20px;
-    display: flex;
-}
-.btn-back {
-    background-color: transparent;
-    border: 1.5px solid #888;
-    padding: 6px 16px;
-    font-size: 0.95rem;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #333;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-.btn-back:hover {
-    background-color: #e0e0e0;
-}
-
-.detail-container {
-    max-width: 1100px;
-    margin: 0 auto 40px;
-    padding: 30px;
-    background-color: #e2e2e2;
-    border-radius: 12px;
-    display: flex;
-    gap: 30px;
-    align-items: flex-start;
-}
-.detail-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-.detail-image img {
-    width: 280px;
-    border-radius: 12px;
-    object-fit: cover;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-.detail-info {
-    flex: 1;
-}
-.title {
-    font-weight: 700;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-}
-.address, .description {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-    color: #333;
-}
-.footer-info {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.price {
-    font-weight: 700;
-    font-size: 1.6rem;
-    color: #b33527;
-}
-.btn-book-now {
-    background-color: #7aa9f7;
-    border: none;
-    padding: 12px 28px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.btn-book-now:hover {
-    background-color: #5a88e6;
-}
-
-@media (max-width: 768px) {
-    .detail-container {
-        flex-direction: column;
-        padding: 20px;
-        text-align: center;
-    }
-    .detail-sidebar {
-        align-items: center;
-    }
-    .detail-image img {
-        width: 100%;
-        max-width: 400px;
-    }
-    .footer-info {
-        flex-direction: column;
-        gap: 16px;
-        margin-top: 30px;
-    }
-    .btn-back {
-        align-self: center;
-    }
-}
-</style>
 @endsection

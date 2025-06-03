@@ -3,70 +3,115 @@
 @section('title', 'Profile')
 
 @section('content')
-<h2 style="margin-bottom: 20px;">Profil Customer</h2>
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6">Profil Customer</h2>
 
-{{-- Flash Message --}}
-@if(session('success'))
-    <div style="padding: 10px; background: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 20px;">
-        {{ session('success') }}
-    </div>
-@endif
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-green-100 text-green-800 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
 
-@if($errors->any())
-    <div style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 20px;">
-        {{ $errors->first() }}
-    </div>
-@endif
+    @if($errors->any())
+        <div class="mb-6 p-4 bg-red-100 text-red-800 rounded">
+            {{ $errors->first() }}
+        </div>
+    @endif
 
-<table style="width:100%; max-width:600px; border-collapse: collapse;">
-    <tr>
-        <td style="padding:8px; font-weight:bold;">Nama Lengkap</td>
-        <td style="padding:8px;">{{ $profile['name'] ?? '-' }}</td>
-    </tr>
-    <tr>
-        <td style="padding:8px; font-weight:bold;">Nomor HP</td>
-        <td style="padding:8px;">{{ $profile['phone_number'] ?? '-' }}</td>
-    </tr>
-    <tr>
-        <td style="padding:8px; font-weight:bold;">Alamat</td>
-        <td style="padding:8px;">{{ $profile['address'] ?? '-' }}</td>
-    </tr>
-    <tr>
-        <td style="padding:8px; font-weight:bold;">Tanggal Lahir</td>
-        <td style="padding:8px;">
-            {{ isset($profile['birth_date']) ? \Carbon\Carbon::parse($profile['birth_date'])->format('d-m-Y') : '-' }}
-        </td>
-    </tr>
-</table>
+    <table class="w-full border-separate border-spacing-y-4">
+        <tbody>
+            <tr>
+                <td class="font-semibold w-40">Nama Lengkap</td>
+                <td>{{ $profile['name'] ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="font-semibold">Nomor HP</td>
+                <td>{{ $profile['phone_number'] ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="font-semibold align-top">Alamat</td>
+                <td class="whitespace-pre-wrap">{{ $profile['address'] ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="font-semibold">Tanggal Lahir</td>
+                <td>{{ isset($profile['birth_date']) ? \Carbon\Carbon::parse($profile['birth_date'])->format('d-m-Y') : '-' }}</td>
+            </tr>
+        </tbody>
+    </table>
 
-<button id="btnEditProfile" style="margin-top:20px; padding:10px 15px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">
-    Edit Profile
-</button>
+    <button
+        id="btnEditProfile"
+        class="mt-6 px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+    >
+        Edit Profile
+    </button>
+</div>
 
 {{-- Modal Edit Profile --}}
-<div id="modalEditProfile" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
-    <div style="background: white; padding: 20px; border-radius: 10px; max-width: 500px; width: 90%;">
-        <h3>Edit Profile</h3>
-        <form method="POST" action="{{ route('customer.profile.update.frontend') }}">
+<div
+    id="modalEditProfile"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+>
+    <div
+        class="bg-white rounded-lg max-w-lg w-full p-8 shadow-lg transform translate-y-10 transition-transform duration-300"
+    >
+        <h3 class="text-xl font-bold mb-6">Edit Profile</h3>
+        <form method="POST" action="{{ route('customer.profile.update.frontend') }}" class="space-y-4">
             @method('PUT')
             @csrf
-            <label for="name">Nama Lengkap</label><br/>
-            <input type="text" id="name" name="name" value="{{ old('name', $profile['name'] ?? '') }}" required style="width: 100%; padding: 8px; margin-bottom: 10px;"><br/>
+            <div>
+                <label for="name" class="block mb-1 font-semibold text-gray-700">Nama Lengkap</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ old('name', $profile['name'] ?? '') }}"
+                    required
+                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+            </div>
+            <div>
+                <label for="phone_number" class="block mb-1 font-semibold text-gray-700">Nomor HP</label>
+                <input
+                    type="text"
+                    id="phone_number"
+                    name="phone_number"
+                    value="{{ old('phone_number', $profile['phone_number'] ?? '') }}"
+                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+            </div>
+            <div>
+                <label for="address" class="block mb-1 font-semibold text-gray-700">Alamat</label>
+                <textarea
+                    id="address"
+                    name="address"
+                    rows="3"
+                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >{{ old('address', $profile['address'] ?? '') }}</textarea>
+            </div>
+            <div>
+                <label for="birth_date" class="block mb-1 font-semibold text-gray-700">Tanggal Lahir</label>
+                <input
+                    type="date"
+                    id="birth_date"
+                    name="birth_date"
+                    value="{{ old('birth_date', $profile['birth_date'] ?? '') }}"
+                    class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+            </div>
 
-            <label for="phone_number">Nomor HP</label><br/>
-            <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number', $profile['phone_number'] ?? '') }}" style="width: 100%; padding: 8px; margin-bottom: 10px;"><br/>
-
-            <label for="address">Alamat</label><br/>
-            <textarea id="address" name="address" rows="3" style="width: 100%; padding: 8px; margin-bottom: 10px;">{{ old('address', $profile['address'] ?? '') }}</textarea><br/>
-
-            <label for="birth_date">Tanggal Lahir</label><br/>
-            <input type="date" id="birth_date" name="birth_date" value="{{ old('birth_date', $profile['birth_date'] ?? '') }}" style="width: 100%; padding: 8px; margin-bottom: 10px;"><br/>
-
-            <div style="text-align: right;">
-                <button type="submit" style="background:#007bff; color:#fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+            <div class="flex justify-end space-x-4 mt-6">
+                <button
+                    type="submit"
+                    class="bg-blue-600 text-white rounded-md px-6 py-2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
                     Simpan
                 </button>
-                <button type="button" id="btnCloseModal" style="background:#dc3545; color:#fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left:10px;">
+                <button
+                    type="button"
+                    id="btnCloseModal"
+                    class="bg-red-600 text-white rounded-md px-6 py-2 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
                     Batal
                 </button>
             </div>
@@ -80,18 +125,19 @@
     const btnClose = document.getElementById('btnCloseModal');
 
     btnEdit.addEventListener('click', () => {
-        modal.style.display = 'flex';
-        modal.style.alignItems = 'center';
-        modal.style.justifyContent = 'center';
+        modal.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-10');
+        modal.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
     });
 
     btnClose.addEventListener('click', () => {
-        modal.style.display = 'none';
+        modal.classList.add('opacity-0', 'pointer-events-none', '-translate-y-10');
+        modal.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
     });
 
-    window.addEventListener('click', (e) => {
+    // Tutup modal saat klik di luar konten
+    modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-            modal.style.display = 'none';
+            btnClose.click();
         }
     });
 </script>

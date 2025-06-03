@@ -9,7 +9,7 @@ class MidtransService
 {
     public function __construct()
     {
-        // Setting konfigurasi Midtrans dari config/midtrans.php atau .env
+        // Set konfigurasi Midtrans dari config/midtrans.php
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production', false);
         Config::$isSanitized = config('midtrans.is_sanitized', true);
@@ -17,17 +17,18 @@ class MidtransService
     }
 
     /**
-     * Buat transaksi pembayaran dan dapatkan token & redirect url
+     * Membuat transaksi pembayaran Snap dan mendapatkan token & redirect URL.
      *
-     * @param string|int $orderId         ID unik untuk transaksi/order
-     * @param float      $grossAmount      Total pembayaran (dalam IDR)
+     * @param string|int $orderId          ID unik transaksi/order
+     * @param float      $grossAmount      Total pembayaran dalam IDR
      * @param array      $customerDetails  Data customer (nama, email, dll)
-     * @return object                     Objek transaksi dari Midtrans
+     * @param array      $additionalParams Parameter tambahan opsional (misal auto_capture, expiry, enabled_payments)
+     * @return object                      Objek transaksi dari Midtrans Snap API
      */
-    public function createTransaction($orderId, $grossAmount, array $customerDetails = [])
+    public function createTransaction($orderId, $grossAmount, array $customerDetails = [], array $additionalParams = [])
     {
-        // Daftar lengkap metode pembayaran yang ingin diaktifkan (sesuaikan jika perlu)
-        $enabledPayments = [
+        // Default metode pembayaran yang aktif
+        $defaultEnabledPayments = [
             'credit_card',
             'bank_transfer',
             'gopay',
@@ -47,18 +48,24 @@ class MidtransService
             'bca_va',
             'bni_va',
             'other_va',
-            // tambahkan metode lain jika perlu
         ];
 
+        // Bangun parameter dasar transaksi
         $params = [
             'transaction_details' => [
                 'order_id' => $orderId,
                 'gross_amount' => $grossAmount,
             ],
             'customer_details' => $customerDetails,
-            'enabled_payments' => $enabledPayments,
+            'enabled_payments' => $defaultEnabledPayments,
         ];
 
+        // Override / merge dengan param tambahan jika ada
+        if (!empty($additionalParams)) {
+            $params = array_replace_recursive($params, $additionalParams);
+        }
+
+        // Buat transaksi menggunakan Snap API
         return Snap::createTransaction($params);
     }
 }

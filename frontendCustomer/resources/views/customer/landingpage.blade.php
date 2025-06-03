@@ -3,178 +3,73 @@
 @section('title', 'Landing Page')
 
 @section('content')
-<div class="category-tabs" role="tablist" aria-label="Kategori layanan">
-    <a role="tab"
-       href="{{ url('/customer/landing?service_type=hotel') }}"
-       class="{{ $serviceType === 'hotel' ? 'active' : '' }}"
-       aria-selected="{{ $serviceType === 'hotel' ? 'true' : 'false' }}">
-        Hotel
-    </a>
-    <a role="tab"
-       href="{{ url('/customer/landing?service_type=event') }}"
-       class="{{ $serviceType === 'event' ? 'active' : '' }}"
-       aria-selected="{{ $serviceType === 'event' ? 'true' : 'false' }}">
-        Event
-    </a>
-    <a role="tab"
-       href="{{ url('/customer/landing?service_type=transportasi') }}"
-       class="{{ $serviceType === 'transportasi' ? 'active' : '' }}"
-       aria-selected="{{ $serviceType === 'transportasi' ? 'true' : 'false' }}">
-        Transportasi
-    </a>
+<div class="max-w-5xl mx-auto mt-8 mb-6 px-4">
+    <nav class="flex justify-center space-x-6 bg-white rounded-xl shadow-md py-2" role="tablist" aria-label="Kategori layanan">
+        <a href="{{ url('/customer/landing?service_type=hotel') }}"
+           role="tab"
+           aria-selected="{{ $serviceType === 'hotel' ? 'true' : 'false' }}"
+           class="px-6 py-2 rounded-lg font-semibold text-gray-600 hover:bg-indigo-100 hover:text-indigo-700
+           {{ $serviceType === 'hotel' ? 'bg-indigo-100 text-indigo-700 shadow' : '' }}">
+            Hotel
+        </a>
+        <a href="{{ url('/customer/landing?service_type=event') }}"
+           role="tab"
+           aria-selected="{{ $serviceType === 'event' ? 'true' : 'false' }}"
+           class="px-6 py-2 rounded-lg font-semibold text-gray-600 hover:bg-indigo-100 hover:text-indigo-700
+           {{ $serviceType === 'event' ? 'bg-indigo-100 text-indigo-700 shadow' : '' }}">
+            Event
+        </a>
+        <a href="{{ url('/customer/landing?service_type=transportasi') }}"
+           role="tab"
+           aria-selected="{{ $serviceType === 'transportasi' ? 'true' : 'false' }}"
+           class="px-6 py-2 rounded-lg font-semibold text-gray-600 hover:bg-indigo-100 hover:text-indigo-700
+           {{ $serviceType === 'transportasi' ? 'bg-indigo-100 text-indigo-700 shadow' : '' }}">
+            Transportasi
+        </a>
+    </nav>
 </div>
 
-<div class="services-list" role="list" aria-live="polite" aria-atomic="true">
+<div class="max-w-6xl mx-auto px-4 mb-12 grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" role="list" aria-live="polite" aria-atomic="true">
     @if(count($services) > 0)
         @foreach($services as $service)
-            <article class="service-card" role="listitem" tabindex="0">
-                <img src="{{ asset($service['photo_url'] ?? 'images/bg1.jpg') }}" alt="{{ $service['title'] ?? 'Service Image' }}" />
-                <div class="overlay-gradient"></div>
-                <div class="info">
-                    <div class="title">{{ $service['title'] }}</div>
-                    <div class="price">Rp {{ number_format($service['price'], 0, ',', '.') }}</div>
-                    <div class="address">{{ $service['service_address'] ?? 'Location not specified' }}</div>
+            <article tabindex="0" role="listitem" class="bg-white rounded-xl shadow-md cursor-pointer flex flex-col transition-transform transform hover:scale-[1.03] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-300">
+                <div class="relative overflow-hidden rounded-t-xl h-44">
+                    <img src="{{ $service['photo_url'] }}" alt="{{ $service['title'] }}" class="w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-50"></div>
                 </div>
-                <button class="rent-now"
+                <div class="p-4 flex-grow flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg text-gray-900 truncate">{{ $service['title'] }}</h3>
+                        <p class="text-red-600 font-semibold mt-1">Rp {{ number_format($service['price'], 0, ',', '.') }}</p>
+                        <p class="text-gray-600 text-sm mt-1 truncate" title="{{ $service['service_address'] ?? 'Location not specified' }}">{{ $service['service_address'] ?? 'Location not specified' }}</p>
+                    </div>
+                    <button
+                        type="button"
                         aria-label="Pesan {{ $service['title'] }}"
-                        onclick="window.location.href='{{ isset($user) ? url('customer/detail/' . $service['service_id']) : route('login') }}'">
-                    Book Now
-                </button>
+                        onclick="window.location.href='{{ isset($user) ? route('customer.detail', ['serviceId' => $service['service_id']]) : route('login') }}'"
+                        class="mt-4 bg-indigo-600 text-white font-semibold py-2 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
+                        Book Now
+                    </button>
+                </div>
             </article>
         @endforeach
     @else
-        <article class="service-card" role="listitem" tabindex="0">
-            <img src="{{ asset('images/bg1.jpg') }}" alt="No services available" />
-            <div class="overlay-gradient"></div>
-            <div class="info">
-                <div class="title">No services available</div>
-                <div class="price">Rp 0</div>
-                <div class="address">Location not specified</div>
+        <article tabindex="0" role="listitem" class="bg-white rounded-xl shadow-md cursor-not-allowed flex flex-col">
+            <div class="relative overflow-hidden rounded-t-xl h-44">
+                <img src="{{ asset('images/bg1.jpg') }}" alt="No services available" class="w-full h-full object-cover opacity-50" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-30"></div>
             </div>
-            <button class="rent-now" disabled aria-label="No services available">Book Now</button>
+            <div class="p-4 flex-grow flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-lg text-gray-400">No services available</h3>
+                    <p class="text-gray-400 font-semibold mt-1">Rp 0</p>
+                    <p class="text-gray-400 text-sm mt-1">Location not specified</p>
+                </div>
+                <button disabled aria-label="No services available" class="mt-4 bg-gray-400 text-white font-semibold py-2 rounded-lg cursor-not-allowed">
+                    Book Now
+                </button>
+            </div>
         </article>
     @endif
 </div>
-
-<style>
-.service-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-
-  /* Animasi saat pertama kali muncul */
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.5s ease forwards;
-
-  /* Transisi untuk animasi hover */
-  transition: box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Hover dan fokus: timbul halus dan naik sedikit */
-.service-card:hover,
-.service-card:focus-within {
-  box-shadow: 0 8px 22px rgb(0 0 0 / 0.2);
-  opacity: 1;
-  transform: translateY(0) scale(1.03);
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.category-tabs {
-    max-width: 900px;
-    margin: 30px auto 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 12px rgb(0 0 0 / 0.15);
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    padding: 8px;
-}
-.category-tabs a {
-    display: inline-block;
-    text-decoration: none;
-    background: transparent;
-    font-weight: 600;
-    padding: 10px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #555;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    text-align: center;
-}
-.category-tabs a.active,
-.category-tabs a:hover {
-    background-color: #dbe0ff;
-    color: #2d43b7;
-    box-shadow: 0 3px 10px rgb(45 67 183 / 0.3);
-}
-.services-list {
-    max-width: 1100px;
-    margin: 0 auto 40px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-    gap: 20px;
-}
-.service-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow 0.3s;
-}
-.service-card:hover {
-    box-shadow: 0 8px 22px rgb(0 0 0 / 0.2);
-}
-.service-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 12px 12px 0 0;
-}
-.info {
-    padding: 12px;
-    flex-grow: 1;
-}
-.title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 6px;
-}
-.price {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #b33527;
-}
-.address {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 6px;
-}
-.rent-now {
-    margin-top: 12px;
-    background-color: #2780b3;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-}
-.rent-now:hover {
-    background-color: #8c271e;
-}
-</style>
 @endsection

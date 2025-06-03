@@ -10,7 +10,14 @@ class Payment extends Model
 
     protected $primaryKey = 'payment_id';
 
+    // Karena payment_id bigint auto-increment, set ini ke true
+    public $incrementing = true;
+
+    // Tipe primary key adalah integer (bigint)
+    protected $keyType = 'int';
+
     protected $fillable = [
+        // jangan isi payment_id manual karena auto-increment
         'booking_id',
         'payment_date',
         'amount',
@@ -34,20 +41,5 @@ class Payment extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class, 'booking_id', 'id');
-    }
-
-    /**
-     * Relasi ke Customer melalui Booking (hasOneThrough)
-     */
-    public function customer()
-    {
-        return $this->hasOneThrough(
-            User::class,
-            Booking::class,
-            'id',           // Foreign key di tabel Booking (booking.id)
-            'id',           // Foreign key di tabel User (user.id)
-            'booking_id',   // Local key di tabel Payment (payment.booking_id)
-            'customer_id'   // Local key di tabel Booking (booking.customer_id)
-        );
     }
 }

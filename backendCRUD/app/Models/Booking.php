@@ -11,14 +11,14 @@ class Booking extends Model
     protected $fillable = [
         'customer_id',
         'service_id',
-        'booking_date',
-        'status',
-        'booking_code',
-        'notes',
-        'cancel_reason',
         'check_in',
         'check_out',
-        'updated_by',
+        'ticket_count',
+        'trip_type',
+        'date_pergi',
+        'date_pulang',
+        'booking_date',
+        'status',
     ];
 
     public $timestamps = true;

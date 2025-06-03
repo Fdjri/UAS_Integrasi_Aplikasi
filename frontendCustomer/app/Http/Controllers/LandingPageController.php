@@ -32,7 +32,10 @@ class LandingPageController extends Controller
             }
 
             if ($response->successful()) {
+                // Ambil services, pastikan array berisi photo_url lengkap
                 $services = $response->json('services', []);
+
+                // Contoh debugging: Log::info('Services: ', $services);
             } else {
                 Log::warning('API services request failed, status: ' . $response->status());
             }
@@ -41,5 +44,38 @@ class LandingPageController extends Controller
         }
 
         return view('customer.landingpage', compact('services', 'user', 'serviceType'));
+    }
+
+    public function show(Request $request, $serviceId)
+    {
+        $user = session('user');
+        $isAuthenticated = !empty($user);
+        $token = session('token'); // token jika user sudah login
+        $apiBase = config('services.backend.url');
+
+        try {
+            if ($isAuthenticated && $token) {
+                $response = Http::withToken($token)
+                    ->get("{$apiBase}/services/{$serviceId}");
+            } else {
+                $response = Http::get("{$apiBase}/services/{$serviceId}");
+            }
+
+            if ($response->successful()) {
+                $service = $response->json('service'); // harus ada key 'photo_url' di API
+            } else {
+                $service = null;
+                \Log::warning('API service detail request failed, status: ' . $response->status());
+            }
+        } catch (\Exception $e) {
+            $service = null;
+            \Log::error('Error fetching service detail: ' . $e->getMessage());
+        }
+
+        if (!$service) {
+            abort(404, 'Service tidak ditemukan');
+        }
+
+        return view('customer.detail', compact('service'));
     }
 }

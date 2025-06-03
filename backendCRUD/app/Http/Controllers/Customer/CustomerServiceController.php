@@ -62,6 +62,7 @@ class CustomerServiceController extends Controller
             return [
                 'service_id' => $service->service_id,
                 'title' => $service->title,
+                'service_type' => $service->service_type,
                 'price' => $service->price,
                 'photo_url' => $service->photo ? asset('storage/' . $service->photo) : asset('images/bg1.jpg'),
                 'service_address' => $service->service_address ?? null,
@@ -82,6 +83,7 @@ class CustomerServiceController extends Controller
         $serviceData = [
             'service_id' => $service->service_id,
             'title' => $service->title,
+            'service_type' => $service->service_type,
             'description' => $service->description,
             'price' => $service->price,
             'photo_url' => $service->photo ? asset('storage/' . $service->photo) : asset('images/bg1.jpg'),

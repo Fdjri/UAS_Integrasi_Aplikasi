@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Customer\CustomerServiceController;
 use App\Http\Controllers\Customer\CustomerBookingController;
-use App\Http\Controllers\Customer\CustomerPaymentController;
 use App\Http\Controllers\Customer\CustomerProfileController;
 
 // Route Auth
@@ -21,14 +20,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('services/{serviceId}', [CustomerServiceController::class, 'show']);
 
     // Booking customer
-    Route::get('customer/services', [CustomerBookingController::class, 'listServices']); // opsional, list layanan khusus customer
-    Route::post('customer/bookings', [CustomerBookingController::class, 'createBooking']);
+    Route::get('customer/services', [CustomerBookingController::class, 'listServices']); // opsional
+
+    // Booking awal (tanpa booking_date)
+    Route::post('customer/bookings/init', [CustomerBookingController::class, 'createInitialBooking']);
+
+    // Update booking_date saat customer masuk halaman payment
+    Route::put('customer/bookings/{bookingId}/update-date', [CustomerBookingController::class, 'updateBookingDate']);
+
+    // **Update payment secara manual tanpa Midtrans**
+    // Route::post('customer/bookings/{bookingId}/payment', [CustomerBookingController::class, 'updatePayment']);
+
+    // Booking detail
     Route::get('customer/bookings/{id}', [CustomerBookingController::class, 'showBooking']);
 
     // Customer Profile
     Route::get('customer/profile', [CustomerProfileController::class, 'show']);
     Route::put('customer/profile', [CustomerProfileController::class, 'update']);
-});
 
-// Webhook Midtrans untuk notifikasi pembayaran (tidak perlu autentikasi)
-Route::post('payment/webhook', [CustomerPaymentController::class, 'handleWebhook']);
+    // Update payment: method, transaction_id, paid_at, payment_expiry
+    Route::put('customer/payments/{paymentId}/update', [CustomerBookingController::class, 'updatePayment']);
+});
