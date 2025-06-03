@@ -10,6 +10,7 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class CustomerBookingController extends Controller
@@ -174,10 +175,11 @@ class CustomerBookingController extends Controller
             $payment->transaction_id = $request->transaction_id;
         }
 
-        if ($request->has('paid') && $request->paid === true) {
+        if ($request->has('paid') && filter_var($request->paid, FILTER_VALIDATE_BOOLEAN)) {
             $payment->paid_at = Carbon::now();
-            $payment->payment_status = 'paid';
+            $payment->payment_status = 'paid';  // update status jadi paid
 
+            // Update status booking jadi confirmed
             $booking = $payment->booking;
             if ($booking) {
                 $booking->status = 'confirmed';
@@ -191,6 +193,63 @@ class CustomerBookingController extends Controller
             'status' => 'success',
             'message' => 'Payment berhasil diperbarui',
             'payment' => $payment
+        ]);
+    }
+
+    public function getPaymentSuccess($paymentId)
+    {
+        $customerId = Auth::id();
+
+        $payment = Payment::with('booking.service')
+            ->where('payment_id', $paymentId)
+            ->where('payment_status', 'paid') // hanya yang status paid
+            ->whereHas('booking', function ($q) use ($customerId) {
+                $q->where('customer_id', $customerId);
+            })
+            ->first();
+
+        if (!$payment) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment tidak ditemukan atau belum dibayar',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'payment' => $payment,
+            'booking' => $payment->booking,
+        ]);
+    }
+
+    public function history(Request $request)
+    {
+        $customerId = Auth::id();
+        Log::info("Customer ID: $customerId, Status filter: ", $request->input('status', []));
+
+        $query = Booking::with(['service', 'payment'])
+            ->where('customer_id', $customerId);
+
+        $statuses = $request->input('status', []);
+        if (!empty($statuses)) {
+            $query->whereIn('status', $statuses);
+        }
+
+        $bookings = $query->orderBy('booking_date', 'desc')->get();
+
+        if ($bookings->isEmpty()) {
+            Log::info("No bookings found for customer $customerId with statuses: ", $statuses);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Booking tidak ditemukan',
+            ], 404);
+        }
+
+        Log::info("Found bookings count: " . $bookings->count());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $bookings,
         ]);
     }
 

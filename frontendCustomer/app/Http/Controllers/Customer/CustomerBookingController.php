@@ -41,14 +41,25 @@ class CustomerBookingController extends Controller
 
         $response = Http::withToken($token)
             ->get($this->apiBaseUrl . '/customer/bookings/history', [
-                'status' => ['cancelled', 'completed', 'failed']
+                'status' => ['confirmed', 'cancelled', 'completed', 'failed']
             ]);
 
         if ($response->failed()) {
+            dd($response->status(), $response->body());
             return back()->withErrors('Gagal mengambil data riwayat booking.');
         }
 
+        // Ambil data booking dari response
         $bookings = $response->json('data', []);
+
+        // Ubah menjadi collection agar mudah digunakan di blade
+        $bookings = collect($bookings);
+
+        // Format tanggal booking_date agar mudah ditampilkan
+        $bookings = $bookings->map(function($booking) {
+            $booking['booking_date'] = isset($booking['booking_date']) ? \Carbon\Carbon::parse($booking['booking_date']) : null;
+            return $booking;
+        });
 
         return view('customer.bookings.history', compact('bookings'));
     }
@@ -274,6 +285,7 @@ class CustomerBookingController extends Controller
 
         $payment = $response->json('payment');
 
+        // Jika sudah dibayar, langsung redirect ke halaman sukses pembayaran
         if ($payment['paid_at'] !== null) {
             return redirect()->route('customer.paymentSuccess', ['paymentId' => $paymentId]);
         }
@@ -286,22 +298,16 @@ class CustomerBookingController extends Controller
     {
         $token = session('token');
 
-        $response = Http::withToken($token)->get($this->apiBaseUrl . "/customer/payments/{$paymentId}");
+        $response = Http::withToken($token)->get($this->apiBaseUrl . "/customer/payments/{$paymentId}/success");
 
         if ($response->failed()) {
-            abort(404, 'Payment tidak ditemukan');
+            abort(404, 'Payment tidak ditemukan atau belum dibayar');
         }
 
         $payment = $response->json('payment');
-        $booking = $payment['booking'] ?? null;
-
-        // Cek status pembayaran
-        if ($payment['payment_status'] !== 'paid') {
-            // Jika belum paid, redirect ke halaman pembayaran untuk melanjutkan
-            return redirect()->route('customer.bookings.showPayment', ['bookingId' => $booking['id'] ?? null])
-                ->withErrors('Pembayaran belum selesai. Silakan lakukan pembayaran terlebih dahulu.');
-        }
+        $booking = $response->json('booking');
 
         return view('customer.paymentSuccess', compact('payment', 'booking'));
     }
+
 }

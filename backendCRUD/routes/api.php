@@ -28,11 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update booking_date saat customer masuk halaman payment
     Route::put('customer/bookings/{bookingId}/update-date', [CustomerBookingController::class, 'updateBookingDate']);
 
-    // **Update payment secara manual tanpa Midtrans**
-    // Route::post('customer/bookings/{bookingId}/payment', [CustomerBookingController::class, 'updatePayment']);
-
     // Booking detail
     Route::get('customer/bookings/{id}', [CustomerBookingController::class, 'showBooking']);
+    Route::get('customer/bookings/history', [CustomerBookingController::class, 'history']);
 
     // Customer Profile
     Route::get('customer/profile', [CustomerProfileController::class, 'show']);
@@ -40,4 +38,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Update payment: method, transaction_id, paid_at, payment_expiry
     Route::put('customer/payments/{paymentId}/update', [CustomerBookingController::class, 'updatePayment']);
+    Route::get('customer/payments/{paymentId}/success', [CustomerBookingController::class, 'getPaymentSuccess']);
 });
