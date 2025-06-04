@@ -225,7 +225,6 @@ class CustomerBookingController extends Controller
     public function history(Request $request)
     {
         $customerId = Auth::id();
-        Log::info("Customer ID: $customerId, Status filter: ", $request->input('status', []));
 
         $query = Booking::with(['service', 'payment'])
             ->where('customer_id', $customerId);
@@ -238,14 +237,11 @@ class CustomerBookingController extends Controller
         $bookings = $query->orderBy('booking_date', 'desc')->get();
 
         if ($bookings->isEmpty()) {
-            Log::info("No bookings found for customer $customerId with statuses: ", $statuses);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Booking tidak ditemukan',
             ], 404);
         }
-
-        Log::info("Found bookings count: " . $bookings->count());
 
         return response()->json([
             'status' => 'success',
