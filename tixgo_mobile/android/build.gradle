@@ -1,7 +1,7 @@
 allprojects {
     repositories {
-        google()
-        mavenCentral()
+        google()  // Menambahkan repositori Google agar Gradle dapat mengunduh dependensi
+        mavenCentral()  // Repositori Maven untuk dependensi lainnya
     }
 }
 
@@ -15,4 +15,15 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
+}
+
+buildscript {
+    repositories {
+        google()  // Repositori Google untuk mengunduh AGP
+        mavenCentral()  // Repositori Maven untuk dependensi lainnya
+    }
+    dependencies {
+        // Pastikan menggunakan AGP versi yang sesuai
+        classpath 'com.android.tools.build:gradle:8.2.1'  // Gantilah versi ini sesuai kebutuhan
+    }
 }

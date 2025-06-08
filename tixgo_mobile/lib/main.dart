@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'pages/login_page.dart';
+import 'pages/login_page.dart'; // Pastikan mengimpor halaman LoginPage
 
 void main() {
   runApp(MyApp());
@@ -14,12 +13,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreen(), // Splash screen sebagai tampilan awal
+      home: SplashScreen(), // Set SplashScreen sebagai tampilan awal
     );
   }
 }
 
-// Splash Screen akan muncul pertama kali selama 5 detik
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -29,11 +27,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Menunggu selama 5 detik dan pindah ke LoginPage
+    // Delay selama 5 detik, kemudian arahkan ke halaman login
     Future.delayed(Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()), // Arahkan ke halaman login setelah splash
+        MaterialPageRoute(builder: (context) => LoginPage()), // Arahkan ke halaman login
       );
     });
   }

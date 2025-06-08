@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AuthService {
-  final String baseUrl = 'http://127.0.0.1:8000/api'; // Ganti dengan URL backend-mu
+  final String baseUrl = 'http://127.0.0.1:8000/api';
 
   // Fungsi untuk login
   Future<Map<String, dynamic>> login(String email, String password) async {

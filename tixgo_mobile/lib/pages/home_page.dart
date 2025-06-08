@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'service_detail_page.dart';  // Import ServiceDetailPage
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,7 +17,6 @@ class _HomePageState extends State<HomePage> {
     final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/services'));
 
     if (response.statusCode == 200) {
-      // Parse the response body and filter the data by category
       List data = jsonDecode(response.body);
       setState(() {
         services = data.where((service) => service['service_type'] == category).toList();
@@ -93,7 +93,13 @@ class _HomePageState extends State<HomePage> {
                     subtitle: Text(services[index]['service_address']),
                     trailing: Icon(Icons.arrow_forward),
                     onTap: () {
-                      // Navigate to service details page or take action
+                      // Navigate to ServiceDetailPage with service data
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ServiceDetailPage(service: services[index]),
+                        ),
+                      );
                     },
                   ),
                 );
