@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/logo.png', width: 150, height: 150), // Ganti dengan logo kamu
+            Image.asset('assets/images/logo.png', width: 150, height: 150), // Ganti dengan logo kamu
             SizedBox(height: 20),
             Text('TixGo', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           ],

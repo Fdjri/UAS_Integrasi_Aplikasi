@@ -26,14 +26,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
 
+        // Mencari user berdasarkan email dan role
         $user = User::where('email', $request->email)
-            ->whereIn('role', ['admin', 'service_provider', 'customer'])
-            ->first();
+                    ->whereIn('role', ['customer', 'admin', 'service_provider'])
+                    ->first();
 
+        // Jika user tidak ditemukan atau password tidak cocok
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => 'Email atau password salah, atau Anda tidak punya akses.',
@@ -42,33 +44,48 @@ class AuthController extends Controller
 
         // Login untuk admin & service_provider via session Laravel
         if (in_array($user->role, ['admin', 'service_provider'])) {
-            Auth::login($user);
+            Auth::login($user);  
             if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('admin.dashboard'); 
             }
             if ($user->role === 'service_provider') {
-                return redirect()->route('provider.dashboard');
+                return redirect()->route('provider.dashboard'); 
             }
         }
+    }
 
-        // Login untuk customer dengan token API (SPA)
-        if ($user->role === 'customer') {
-            $user->tokens()->delete(); // hapus token lama
+    public function loginCustomer(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+        // Mencari user dengan role customer
+        $user = User::where('email', $request->email)
+                    ->where('role', 'customer') 
+                    ->first();
 
+        // Jika user tidak ditemukan atau password tidak cocok
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-                'message' => 'Login berhasil',
-            ]);
+                'message' => 'Email atau password salah, atau Anda tidak punya akses.',
+            ], 401);
         }
 
-        // Fallback jika role tidak dikenal
+        // Hapus token lama
+        $user->tokens()->delete();
+
+        // Buat token baru untuk customer
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Kembalikan response dengan token
         return response()->json([
-            'message' => 'Role tidak dikenal',
-        ], 403);
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'message' => 'Login berhasil',
+        ]);
     }
 
     // Logout user

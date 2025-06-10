@@ -15,10 +15,7 @@ return [
     'allowed_methods' => ['*'],
 
     // Domain/port frontend-mu
-    'allowed_origins' => [
-        'http://127.0.0.1:8001',
-        'http://localhost:8001',
-    ],
+    'allowed_origins' => ['*'],
 
     // Header apa saja yang diizinkan
     'allowed_headers' => ['*'],

@@ -25,7 +25,7 @@ class LoginController extends Controller
 
         $apiBase = config('services.backend.url');
 
-        $response = Http::post("{$apiBase}/login", [
+        $response = Http::post("{$apiBase}/login/customer", [
             'email'    => $request->input('email'),
             'password' => $request->input('password'),
         ]);

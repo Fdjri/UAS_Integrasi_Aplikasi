@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/login_logo.png', width: 50, height: 50),  // Sesuaikan logo
+            Image.asset('assets/images/logo.png', width: 50, height: 50),  // Sesuaikan logo
             SizedBox(height: 30),
             Text('Masuk', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             SizedBox(height: 40),

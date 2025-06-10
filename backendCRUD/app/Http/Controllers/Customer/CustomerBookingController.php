@@ -112,6 +112,8 @@ class CustomerBookingController extends Controller
                 'booking' => $booking,
                 'payment' => $payment,
                 'total_price' => $totalPrice,
+                'booking_id' => $booking->id,
+                'payment_id' => $payment->payment_id,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();

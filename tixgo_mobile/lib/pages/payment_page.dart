@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'process_page.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';  // For encoding the request body
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // For secure storage
 
 class PaymentPage extends StatefulWidget {
   final Map service;  // Menerima data layanan yang dipilih
@@ -14,36 +17,89 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  // Menyimpan pilihan metode pembayaran
   String? _selectedPaymentMethod;
+  bool _isUpdating = false; // To track if the booking date update request is in progress
+  final _storage = FlutterSecureStorage();  // Instance of secure storage
 
-  // Fungsi untuk menangani pembayaran
-  void _handlePayment() {
+  // Fungsi untuk mengonfirmasi pembayaran dan memperbarui booking date
+  Future<void> _handlePayment() async {
     if (_selectedPaymentMethod == null) {
-      // Menampilkan pesan error jika metode pembayaran belum dipilih
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Pilih metode pembayaran terlebih dahulu')),
       );
       return;
     }
 
-    // Jika sudah memilih metode pembayaran, tampilkan informasi
-    print('Pembayaran untuk: ${widget.service['title']}');
-    print('Metode Pembayaran: $_selectedPaymentMethod');
-    // Arahkan ke halaman konfirmasi pembayaran atau status pembayaran selesai
+    // Get the payment ID and bookingId from service data
+    final paymentId = widget.service['payment_id'];  // Access the payment_id from the service data
+    final bookingId = widget.service['booking_id'];  // Access the booking_id from the service data
+
+    if (paymentId == null || bookingId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking ID or Payment ID tidak ditemukan')),
+      );
+      return;
+    }
+
+    // Update payment status to 'pending'
+    await _updatePaymentStatus(paymentId);
+
+    // Pass all necessary data to ProcessPage
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ProcessPage(
-          service: widget.service,
-          total: widget.total,
+          service: widget.service,  // Passing the service data
+          total: widget.total,  // Passing the total amount
+          bookingId: bookingId,  // Pass the booking_id
+          paymentId: paymentId,  // Pass the payment_id
+          paymentMethod: _selectedPaymentMethod!, ticketCount: null,  // Pass the selected payment method
         ),
       ),
     );
   }
 
+  // Function to send PUT request to update the payment status
+  Future<void> _updatePaymentStatus(int paymentId) async {
+    // Get the access token from secure storage
+    String? accessToken = await _storage.read(key: 'access_token');
+    if (accessToken == null || accessToken.isEmpty) {
+      print('Access token is missing.');
+      return;
+    }
+
+    final url = 'http://192.168.1.25:8000/api/customer/payments/$paymentId/update'; // API endpoint to update payment status
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken', // Use the stored token here
+        },
+        body: json.encode({
+          'method': _selectedPaymentMethod,  // Include the selected payment method
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print('Payment status updated: ${responseData['message']}');
+      } else {
+        final responseData = jsonDecode(response.body);
+        print('Error updating payment status: ${responseData['message']}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal memperbarui status pembayaran')));
+      }
+    } catch (error) {
+      print('Error during payment status update: $error');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Terjadi kesalahan saat memperbarui status pembayaran')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final imageUrl = widget.service['photo_url'];
+
     return Scaffold(
       appBar: AppBar(title: Text('Metode Pembayaran')),
       body: Padding(
@@ -51,16 +107,15 @@ class _PaymentPageState extends State<PaymentPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Menampilkan gambar layanan
-            Image.network(
-              'http://127.0.0.1:8000/${widget.service['photo_url']}',
+            CachedNetworkImage(
+              imageUrl: imageUrl,
               width: double.infinity,
               height: 200,
               fit: BoxFit.cover,
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             SizedBox(height: 16),
-
-            // Menampilkan detail layanan
             Text(
               widget.service['title'],
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -70,8 +125,6 @@ class _PaymentPageState extends State<PaymentPage> {
             SizedBox(height: 8),
             Text('Harga: Rp ${widget.service['price']}'),
             SizedBox(height: 16),
-
-            // Pilihan metode pembayaran
             Text('Pilih metode pembayaran:', style: TextStyle(fontSize: 18)),
             ListTile(
               title: Text('Metode A'),
@@ -109,18 +162,12 @@ class _PaymentPageState extends State<PaymentPage> {
                 },
               ),
             ),
-
             SizedBox(height: 20),
-
-            // Menampilkan total harga
             Text('Total: Rp ${widget.total}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
             SizedBox(height: 20),
-
-            // Tombol untuk melakukan pembayaran
             ElevatedButton(
-              onPressed: _handlePayment,
-              child: Text('Bayar'),
+              onPressed: _isUpdating ? null : _handlePayment,
+              child: _isUpdating ? CircularProgressIndicator() : Text('Bayar'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
               ),

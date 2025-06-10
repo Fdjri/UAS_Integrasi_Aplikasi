@@ -7,7 +7,7 @@ use App\Http\Controllers\Customer\CustomerBookingController;
 use App\Http\Controllers\Customer\CustomerProfileController;
 
 // Route Auth
-Route::post('login', [AuthController::class, 'login']);
+Route::post('/login/customer', [AuthController::class, 'loginCustomer']);
 Route::post('register/customer', [AuthController::class, 'registerCustomer']);
 
 // Route publik tanpa autentikasi, untuk landing page sebelum login

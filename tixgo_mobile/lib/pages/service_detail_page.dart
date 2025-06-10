@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Import CachedNetworkImage
 import 'booking_page.dart';  // Import halaman booking
 
 class ServiceDetailPage extends StatelessWidget {
@@ -9,6 +10,12 @@ class ServiceDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Construct the correct image URL (ensure it's not repeated)
+    final imageUrl = service['photo_url'];
+
+    // Debugging: Check if description exists in the service data
+    print(service['description']);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Detail Layanan'),
@@ -19,11 +26,13 @@ class ServiceDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Gambar layanan
-            Image.network(
-              'http://127.0.0.1:8000/${service['photo_url']}',  // Sesuaikan dengan path gambar layanan
+            CachedNetworkImage(
+              imageUrl: imageUrl,  // Use the correct image URL from the backend
               width: double.infinity,
               height: 250,
               fit: BoxFit.cover,
+              placeholder: (context, url) => CircularProgressIndicator(), // Placeholder during loading
+              errorWidget: (context, url, error) => Icon(Icons.error), // Error widget in case of failure
             ),
             SizedBox(height: 16),
 
@@ -39,7 +48,7 @@ class ServiceDetailPage extends StatelessWidget {
               children: [
                 Icon(Icons.location_on, color: Colors.grey),
                 SizedBox(width: 8),
-                Text(service['service_address']),
+                Text(service['service_address'] ?? 'No address available'),
               ],
             ),
             SizedBox(height: 16),
@@ -53,25 +62,31 @@ class ServiceDetailPage extends StatelessWidget {
 
             // Deskripsi layanan
             Text(
-              service['description'] ?? 'No description available',
+              service['description'] != null && service['description'].isNotEmpty
+                  ? service['description']
+                  : 'No description available',
               style: TextStyle(fontSize: 16),
             ),
             Spacer(),
 
             // Tombol untuk melakukan pemesanan
-            ElevatedButton(
-              onPressed: () {
-                // Mengarahkan pengguna ke halaman booking sesuai dengan layanan yang dipilih
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BookingPage(service: service),
-                  ),
-                );
-              },
-              child: Text('Book Now'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+            Align(
+              alignment: Alignment.bottomCenter, // Centers the button at the bottom
+              child: ElevatedButton(
+                onPressed: () {
+                  // Mengarahkan pengguna ke halaman booking sesuai dengan layanan yang dipilih
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingPage(service: service),
+                    ),
+                  );
+                },
+                child: Text('Book Now'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 16), // Optional: Adjust padding for the button
+                ),
               ),
             ),
           ],
