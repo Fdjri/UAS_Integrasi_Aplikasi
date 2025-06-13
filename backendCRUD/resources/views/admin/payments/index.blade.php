@@ -302,7 +302,7 @@
             @method('PUT')
             <label for="status-{{ $payment->id }}">Status</label>
             <select name="payment_status" id="status-{{ $payment->id }}" required>
-                @foreach(['pending', 'confirmed', 'cancelled', 'completed', 'failed', 'refunded', 'paid'] as $status)
+                @foreach(['pending', 'failed', 'refunded', 'paid'] as $status)
                     <option value="{{ $status }}" {{ $payment->payment_status == $status ? 'selected' : '' }}>
                         {{ ucfirst($status) }}
                     </option>
