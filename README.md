@@ -12,6 +12,8 @@ Sistem ini terdiri dari tiga aplikasi terpisah yang saling terhubung melalui API
 
 ## 🏛️ Arsitektur Sistem
 
+Arsitektur proyek ini dirancang dengan pendekatan headless, di mana aplikasi backend berfungsi sebagai penyedia data utama (melalui API) yang kemudian dikonsumsi oleh berbagai aplikasi frontend (web dan mobile).
+
 ```
 [ Aplikasi Mobile (Flutter) ] <---+
                                   |
